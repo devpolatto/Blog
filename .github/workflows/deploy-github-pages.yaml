@@ -1,0 +1,86 @@
+name: Deploy to GitHub Pages
+
+on:
+  # Trigger manual (útil para testar)
+  workflow_dispatch:
+
+  # Trigger vindo do repositório Vault
+  repository_dispatch:
+    types: [sync-vault-content]
+
+  # Opcional: também dispara em push direto no blog (ex: mudanças de layout)
+  push:
+    branches:
+      - v4
+    paths-ignore:
+      - "content/**" # evita loop se alguém commitar content direto
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # necessário para o deploy no GitHub Pages
+
+    steps:
+      - name: Checkout Blog (código-fonte)
+        uses: actions/checkout@v4
+        with:
+          ref: v4 # branch principal do seu blog
+          fetch-depth: 0 # histórico completo (necessário para o Quartz)
+
+      - name: Checkout DevSecOps Vault (notas privadas)
+        uses: actions/checkout@v4
+        with:
+          repository: devpolatto/DevSecOps-Vault # <-- troque pelo nome real do seu Vault
+          token: ${{ secrets.VAULT_ACCESS_TOKEN }}
+          path: vault-content # clona numa pasta temporária
+          ref: master
+
+      - name: Sync DevSecOps Vault content -> content/
+        run: |
+          echo "🔄 Sync DevSecOps Vault..."
+
+          # Limpa o content atual (exceto index.md se você tiver um fixo)
+          find content/ -name "*.md" -not -name "index.md" -delete
+
+          # Copia todos os .md do Vault para content/
+          # Ajuste o caminho abaixo se suas notas ficam numa subpasta do Vault
+          # Ex: vault-content/Notes/, vault-content/Blog/ etc.
+          rsync -av --include="*.md" --include="*.png" --include="*.jpg" \
+                    --include="*.svg" --include="*.gif" \
+                    --include="*/" --exclude="*" \
+                    --exclude=".obsidian/" \
+                    --exclude=".trash/" \
+                    --exclude="Templates/" \
+                    vault-content/ content/
+
+          echo "✅ Sync DevSecOps Vault Finished!"
+          echo "📝 Notes synced:"
+          find content/ -name "*.md" | wc -l
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22 # versão do .node-version do seu repo
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Quartz
+        run: npx quartz build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public # diretório de output do Quartz
+          publish_branch: gh-pages
+          cname: ${{ secrets.CUSTOM_DOMAIN }} # opcional: remove se não tiver domínio custom
