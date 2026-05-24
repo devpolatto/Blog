@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr"><head><title>Conformidade PCI-DSS com Elastic SIEM: Mapeamento de Requisitos e Implementação</title><meta charset="utf-8"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="Quartz 4"/><meta property="og:title" content="Conformidade PCI-DSS com Elastic SIEM: Mapeamento de Requisitos e Implementação"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="Conformidade PCI-DSS com Elastic SIEM: Mapeamento de Requisitos e Implementação"/><meta name="twitter:description" content="Como o Elastic SIEM Atende aos Requisitos Críticos do PCI-DSS Um guia estratégico para justificar o investimento em Elastic SIEM demonstrando cobertura dos requisitos 7, 10, e 11 do PCI-DSS, com foco em redução de risco e custo operacional."/><meta property="og:description" content="Como o Elastic SIEM Atende aos Requisitos Críticos do PCI-DSS Um guia estratégico para justificar o investimento em Elastic SIEM demonstrando cobertura dos requisitos 7, 10, e 11 do PCI-DSS, com foco em redução de risco e custo operacional."/><meta property="og:image:alt" content="Como o Elastic SIEM Atende aos Requisitos Críticos do PCI-DSS Um guia estratégico para justificar o investimento em Elastic SIEM demonstrando cobertura dos requisitos 7, 10, e 11 do PCI-DSS, com foco em redução de risco e custo operacional."/><meta property="twitter:domain" content="quartz.jzhao.xyz"/><meta property="og:url" content="https://quartz.jzhao.xyz/Elastic/Security/elastic-siem-conformidade-pci-dss"/><meta property="twitter:url" content="https://quartz.jzhao.xyz/Elastic/Security/elastic-siem-conformidade-pci-dss"/><link rel="icon" href="../../static/icon.png"/><meta name="description" content="Como o Elastic SIEM Atende aos Requisitos Críticos do PCI-DSS Um guia estratégico para justificar o investimento em Elastic SIEM demonstrando cobertura dos requisitos 7, 10, e 11 do PCI-DSS, com foco em redução de risco e custo operacional."/><meta name="generator" content="Quartz"/><link href="../../index.css" rel="stylesheet" type="text/css" data-persist="true"/><style>.expand-button {
+  position: absolute;
+  display: flex;
+  float: right;
+  padding: 0.4rem;
+  margin: 0.3rem;
+  right: 0;
+  color: var(--gray);
+  border-color: var(--dark);
+  background-color: var(--light);
+  border: 1px solid;
+  border-radius: 5px;
+  opacity: 0;
+  transition: 0.2s;
+}
+.expand-button > svg {
+  fill: var(--light);
+  filter: contrast(0.3);
+}
+.expand-button:hover {
+  cursor: pointer;
+  border-color: var(--secondary);
+}
+.expand-button:focus {
+  outline: 0;
+}
+
+pre:hover > .expand-button {
+  opacity: 1;
+  transition: 0.2s;
+}
+
+#mermaid-container {
+  position: fixed;
+  contain: layout;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: none;
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.5);
+}
+#mermaid-container.active {
+  display: inline-block;
+}
+#mermaid-container > #mermaid-space {
+  border: 1px solid var(--lightgray);
+  background-color: var(--light);
+  border-radius: 5px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 80vh;
+  width: 80vw;
+  overflow: hidden;
+}
+#mermaid-container > #mermaid-space > .mermaid-content {
+  position: relative;
+  transform-origin: 0 0;
+  transition: transform 0.1s ease;
+  overflow: visible;
+  min-height: 200px;
+  min-width: 200px;
+}
+#mermaid-container > #mermaid-space > .mermaid-content pre {
+  margin: 0;
+  border: none;
+}
+#mermaid-container > #mermaid-space > .mermaid-content svg {
+  max-width: none;
+  height: auto;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--lightgray);
+  background: var(--light);
+  color: var(--dark);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: var(--bodyFont);
+  transition: all 0.2s ease;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:hover {
+  background: var(--lightgray);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:active {
+  transform: translateY(1px);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:nth-child(2) {
+  width: auto;
+  padding: 0 12px;
+  font-size: 14px;
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VSb290IjoiL2hvbWUvcnVubmVyL3dvcmsvQmxvZy9CbG9nL3F1YXJ0ei9jb21wb25lbnRzL3N0eWxlcyIsInNvdXJjZXMiOlsibWVybWFpZC5pbmxpbmUuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7RUFDQTs7QUFHRjtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTs7O0FBS0Y7RUFDRTtFQUNBOzs7QUFJSjtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7O0FBRUE7RUFDRTs7QUFHRjtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7RUFDQTs7QUFHRjtFQUNFO0VBQ0E7O0FBSUo7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFOztBQUdGO0VBQ0U7O0FBSUY7RUFDRTtFQUNBO0VBQ0EiLCJzb3VyY2VzQ29udGVudCI6WyIuZXhwYW5kLWJ1dHRvbiB7XG4gIHBvc2l0aW9uOiBhYnNvbHV0ZTtcbiAgZGlzcGxheTogZmxleDtcbiAgZmxvYXQ6IHJpZ2h0O1xuICBwYWRkaW5nOiAwLjRyZW07XG4gIG1hcmdpbjogMC4zcmVtO1xuICByaWdodDogMDsgLy8gTk9URTogcmlnaHQgd2lsbCBiZSBzZXQgaW4gbWVybWFpZC5pbmxpbmUudHNcbiAgY29sb3I6IHZhcigtLWdyYXkpO1xuICBib3JkZXItY29sb3I6IHZhcigtLWRhcmspO1xuICBiYWNrZ3JvdW5kLWNvbG9yOiB2YXIoLS1saWdodCk7XG4gIGJvcmRlcjogMXB4IHNvbGlkO1xuICBib3JkZXItcmFkaXVzOiA1cHg7XG4gIG9wYWNpdHk6IDA7XG4gIHRyYW5zaXRpb246IDAuMnM7XG5cbiAgJiA+IHN2ZyB7XG4gICAgZmlsbDogdmFyKC0tbGlnaHQpO1xuICAgIGZpbHRlcjogY29udHJhc3QoMC4zKTtcbiAgfVxuXG4gICY6aG92ZXIge1xuICAgIGN1cnNvcjogcG9pbnRlcjtcbiAgICBib3JkZXItY29sb3I6IHZhcigtLXNlY29uZGFyeSk7XG4gIH1cblxuICAmOmZvY3VzIHtcbiAgICBvdXRsaW5lOiAwO1xuICB9XG59XG5cbnByZSB7XG4gICY6aG92ZXIgPiAuZXhwYW5kLWJ1dHRvbiB7XG4gICAgb3BhY2l0eTogMTtcbiAgICB0cmFuc2l0aW9uOiAwLjJzO1xuICB9XG59XG5cbiNtZXJtYWlkLWNvbnRhaW5lciB7XG4gIHBvc2l0aW9uOiBmaXhlZDtcbiAgY29udGFpbjogbGF5b3V0O1xuICB6LWluZGV4OiA5OTk7XG4gIGxlZnQ6IDA7XG4gIHRvcDogMDtcbiAgd2lkdGg6IDEwMHZ3O1xuICBoZWlnaHQ6IDEwMHZoO1xuICBvdmVyZmxvdzogaGlkZGVuO1xuICBkaXNwbGF5OiBub25lO1xuICBiYWNrZHJvcC1maWx0ZXI6IGJsdXIoNHB4KTtcbiAgYmFja2dyb3VuZDogcmdiYSgwLCAwLCAwLCAwLjUpO1xuXG4gICYuYWN0aXZlIHtcbiAgICBkaXNwbGF5OiBpbmxpbmUtYmxvY2s7XG4gIH1cblxuICAmID4gI21lcm1haWQtc3BhY2Uge1xuICAgIGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWxpZ2h0Z3JheSk7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tbGlnaHQpO1xuICAgIGJvcmRlci1yYWRpdXM6IDVweDtcbiAgICBwb3NpdGlvbjogZml4ZWQ7XG4gICAgdG9wOiA1MCU7XG4gICAgbGVmdDogNTAlO1xuICAgIHRyYW5zZm9ybTogdHJhbnNsYXRlKC01MCUsIC01MCUpO1xuICAgIGhlaWdodDogODB2aDtcbiAgICB3aWR0aDogODB2dztcbiAgICBvdmVyZmxvdzogaGlkZGVuO1xuXG4gICAgJiA+IC5tZXJtYWlkLWNvbnRlbnQge1xuICAgICAgcG9zaXRpb246IHJlbGF0aXZlO1xuICAgICAgdHJhbnNmb3JtLW9yaWdpbjogMCAwO1xuICAgICAgdHJhbnNpdGlvbjogdHJhbnNmb3JtIDAuMXMgZWFzZTtcbiAgICAgIG92ZXJmbG93OiB2aXNpYmxlO1xuICAgICAgbWluLWhlaWdodDogMjAwcHg7XG4gICAgICBtaW4td2lkdGg6IDIwMHB4O1xuXG4gICAgICBwcmUge1xuICAgICAgICBtYXJnaW46IDA7XG4gICAgICAgIGJvcmRlcjogbm9uZTtcbiAgICAgIH1cblxuICAgICAgc3ZnIHtcbiAgICAgICAgbWF4LXdpZHRoOiBub25lO1xuICAgICAgICBoZWlnaHQ6IGF1dG87XG4gICAgICB9XG4gICAgfVxuXG4gICAgJiA+IC5tZXJtYWlkLWNvbnRyb2xzIHtcbiAgICAgIHBvc2l0aW9uOiBhYnNvbHV0ZTtcbiAgICAgIGJvdHRvbTogMjBweDtcbiAgICAgIHJpZ2h0OiAyMHB4O1xuICAgICAgZGlzcGxheTogZmxleDtcbiAgICAgIGdhcDogOHB4O1xuICAgICAgcGFkZGluZzogOHB4O1xuICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHQpO1xuICAgICAgYm9yZGVyOiAxcHggc29saWQgdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgIGJvcmRlci1yYWRpdXM6IDZweDtcbiAgICAgIGJveC1zaGFkb3c6IDAgMnB4IDRweCByZ2JhKDAsIDAsIDAsIDAuMSk7XG4gICAgICB6LWluZGV4OiAyO1xuXG4gICAgICAubWVybWFpZC1jb250cm9sLWJ1dHRvbiB7XG4gICAgICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgICAgIGFsaWduLWl0ZW1zOiBjZW50ZXI7XG4gICAgICAgIGp1c3RpZnktY29udGVudDogY2VudGVyO1xuICAgICAgICB3aWR0aDogMzJweDtcbiAgICAgICAgaGVpZ2h0OiAzMnB4O1xuICAgICAgICBwYWRkaW5nOiAwO1xuICAgICAgICBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1saWdodGdyYXkpO1xuICAgICAgICBiYWNrZ3JvdW5kOiB2YXIoLS1saWdodCk7XG4gICAgICAgIGNvbG9yOiB2YXIoLS1kYXJrKTtcbiAgICAgICAgYm9yZGVyLXJhZGl1czogNHB4O1xuICAgICAgICBjdXJzb3I6IHBvaW50ZXI7XG4gICAgICAgIGZvbnQtc2l6ZTogMTZweDtcbiAgICAgICAgZm9udC1mYW1pbHk6IHZhcigtLWJvZHlGb250KTtcbiAgICAgICAgdHJhbnNpdGlvbjogYWxsIDAuMnMgZWFzZTtcblxuICAgICAgICAmOmhvdmVyIHtcbiAgICAgICAgICBiYWNrZ3JvdW5kOiB2YXIoLS1saWdodGdyYXkpO1xuICAgICAgICB9XG5cbiAgICAgICAgJjphY3RpdmUge1xuICAgICAgICAgIHRyYW5zZm9ybTogdHJhbnNsYXRlWSgxcHgpO1xuICAgICAgICB9XG5cbiAgICAgICAgLy8gU3R5bGUgdGhlIHJlc2V0IGJ1dHRvbiBkaWZmZXJlbnRseVxuICAgICAgICAmOm50aC1jaGlsZCgyKSB7XG4gICAgICAgICAgd2lkdGg6IGF1dG87XG4gICAgICAgICAgcGFkZGluZzogMCAxMnB4O1xuICAgICAgICAgIGZvbnQtc2l6ZTogMTRweDtcbiAgICAgICAgfVxuICAgICAgfVxuICAgIH1cbiAgfVxufVxuIl19 */</style><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../../prescript.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../../static/contentIndex.json").then(data => data.json())</script><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="https://quartz.jzhao.xyz/index.xml"/><meta property="og:image:width" content="1200"/><meta property="og:image:height" content="630"/><meta property="og:image" content="https://quartz.jzhao.xyz/Elastic/Security/elastic-siem-conformidade-pci-dss-og-image.webp"/><meta property="og:image:url" content="https://quartz.jzhao.xyz/Elastic/Security/elastic-siem-conformidade-pci-dss-og-image.webp"/><meta name="twitter:image" content="https://quartz.jzhao.xyz/Elastic/Security/elastic-siem-conformidade-pci-dss-og-image.webp"/><meta property="og:image:type" content="image/.webp"/></head><body data-slug="Elastic/Security/elastic-siem-conformidade-pci-dss"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h2 class="page-title"><a href="../..">Quartz 4</a></h2><div class="spacer mobile-only"></div><div class="flex-component" style="flex-direction: row; flex-wrap: nowrap; gap: 1rem;"><div style="flex-grow: 1; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><div class="search"><button class="search-button"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>Search</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div class="search-layout" data-preview="true"></div></div></div></div></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="darkmode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="Dark mode"><title>Dark mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="Light mode"><title>Light mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="readermode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="readerIcon" fill="currentColor" stroke="currentColor" stroke-width="0.2" stroke-linecap="round" stroke-linejoin="round" width="64px" height="64px" viewBox="0 0 24 24" aria-label="Reader mode"><title>Reader mode</title><g transform="translate(-1.8, -1.8) scale(1.15, 1.2)"><path d="M8.9891247,2.5 C10.1384702,2.5 11.2209868,2.96705384 12.0049645,3.76669482 C12.7883914,2.96705384 13.8709081,2.5 15.0202536,2.5 L18.7549359,2.5 C19.1691495,2.5 19.5049359,2.83578644 19.5049359,3.25 L19.5046891,4.004 L21.2546891,4.00457396 C21.6343849,4.00457396 21.9481801,4.28672784 21.9978425,4.6528034 L22.0046891,4.75457396 L22.0046891,20.25 C22.0046891,20.6296958 21.7225353,20.943491 21.3564597,20.9931534 L21.2546891,21 L2.75468914,21 C2.37499337,21 2.06119817,20.7178461 2.01153575,20.3517706 L2.00468914,20.25 L2.00468914,4.75457396 C2.00468914,4.37487819 2.28684302,4.061083 2.65291858,4.01142057 L2.75468914,4.00457396 L4.50368914,4.004 L4.50444233,3.25 C4.50444233,2.87030423 4.78659621,2.55650904 5.15267177,2.50684662 L5.25444233,2.5 L8.9891247,2.5 Z M4.50368914,5.504 L3.50468914,5.504 L3.50468914,19.5 L10.9478955,19.4998273 C10.4513189,18.9207296 9.73864328,18.5588115 8.96709342,18.5065584 L8.77307039,18.5 L5.25444233,18.5 C4.87474657,18.5 4.56095137,18.2178461 4.51128895,17.8517706 L4.50444233,17.75 L4.50368914,5.504 Z M19.5049359,17.75 C19.5049359,18.1642136 19.1691495,18.5 18.7549359,18.5 L15.2363079,18.5 C14.3910149,18.5 13.5994408,18.8724714 13.0614828,19.4998273 L20.5046891,19.5 L20.5046891,5.504 L19.5046891,5.504 L19.5049359,17.75 Z M18.0059359,3.999 L15.0202536,4 L14.8259077,4.00692283 C13.9889509,4.06666544 13.2254227,4.50975805 12.7549359,5.212 L12.7549359,17.777 L12.7782651,17.7601316 C13.4923805,17.2719483 14.3447024,17 15.2363079,17 L18.0059359,16.999 L18.0056891,4.798 L18.0033792,4.75457396 L18.0056891,4.71 L18.0059359,3.999 Z M8.9891247,4 L6.00368914,3.999 L6.00599909,4.75457396 L6.00599909,4.75457396 L6.00368914,4.783 L6.00368914,16.999 L8.77307039,17 C9.57551536,17 10.3461406,17.2202781 11.0128313,17.6202194 L11.2536891,17.776 L11.2536891,5.211 C10.8200889,4.56369974 10.1361548,4.13636104 9.37521067,4.02745763 L9.18347055,4.00692283 L8.9891247,4 Z"></path></g></svg></button></div></div><div class="explorer" data-behavior="link" data-collapsed="collapsed" data-savestate="true" data-data-fns="{&quot;order&quot;:[&quot;filter&quot;,&quot;map&quot;,&quot;sort&quot;],&quot;sortFn&quot;:&quot;(a,b)=>!a.isFolder&amp;&amp;!b.isFolder||a.isFolder&amp;&amp;b.isFolder?a.displayName.localeCompare(b.displayName,void 0,{numeric:!0,sensitivity:\&quot;base\&quot;}):!a.isFolder&amp;&amp;b.isFolder?1:-1&quot;,&quot;filterFn&quot;:&quot;node=>node.slugSegment!==\&quot;tags\&quot;&quot;,&quot;mapFn&quot;:&quot;node=>node&quot;}"><button type="button" class="explorer-toggle mobile-explorer hide-until-loaded" data-mobile="true" aria-controls="explorer-86"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-menu"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button><button type="button" class="title-button explorer-toggle desktop-explorer" data-mobile="false" aria-expanded="true"><h2>Explorer</h2><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="explorer-86" class="explorer-content" aria-expanded="false" role="group"><ul class="explorer-ul overflow" id="list-0"><li class="overflow-end"></li></ul></div><template id="template-file"><li><a href="#"></a></li></template><template id="template-folder"><li><div class="folder-container"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="folder-icon"><polyline points="6 9 12 15 18 9"></polyline></svg><div><button class="folder-button"><span class="folder-title"></span></button></div></div><div class="folder-outer"><ul class="content"></ul></div></li></template></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../../Elastic/">Elastic</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../../Elastic/Security/">Security</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>Conformidade PCI DSS com Elastic SIEM: Mapeamento de Requisitos e Implementação</a></div></nav><h1 class="article-title">Conformidade PCI-DSS com Elastic SIEM: Mapeamento de Requisitos e Implementação</h1><p show-comma="true" class="content-meta"><time datetime="2026-05-24T15:59:59.256Z">May 24, 2026</time><span>10 min read</span></p><ul class="tags"><li><a href="../../tags/Elasticsearch" class="internal tag-link">Elasticsearch</a></li><li><a href="../../tags/PCI-DSS" class="internal tag-link">PCI-DSS</a></li><li><a href="../../tags/Compliance" class="internal tag-link">Compliance</a></li><li><a href="../../tags/SIEM" class="internal tag-link">SIEM</a></li><li><a href="../../tags/ILM" class="internal tag-link">ILM</a></li><li><a href="../../tags/Security" class="internal tag-link">Security</a></li></ul></div></div><article class="popover-hint"><p><img src="../../Elastic/elasticsearch-logo.png" width="auto" height="auto" alt/></p>
+<h1 id="como-o-elastic-siem-atende-aos-requisitos-críticos-do-pci-dss">Como o Elastic SIEM Atende aos Requisitos Críticos do PCI-DSS<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#como-o-elastic-siem-atende-aos-requisitos-críticos-do-pci-dss" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<blockquote>
+<p>Um guia estratégico para justificar o investimento em Elastic SIEM demonstrando cobertura dos requisitos 7, 10, e 11 do PCI-DSS, com foco em redução de risco e custo operacional.</p>
+</blockquote>
+<h2 id="introdução-por-que-pci-dss-importa">Introdução: Por Que PCI-DSS Importa<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#introdução-por-que-pci-dss-importa" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>O <strong>PCI Data Security Standard (PCI-DSS)</strong> é o padrão de segurança obrigatório para qualquer organização que processa, armazena ou transmite dados de cartões de pagamento. Não é opcional — é um requisito regulatório que pode resultar em multas de até <strong>$100.000 por dia</strong> em caso de não conformidade.</p>
+<p>Mas aqui está o insight estratégico: <strong>PCI-DSS não é apenas sobre compliance</strong> — é sobre reduzir riscos reais:</p>
+<ul>
+<li>Detecção de ameaças em tempo real</li>
+<li>Proteção de dados sensíveis</li>
+<li>Resposta rápida a incidentes</li>
+<li>Prova auditável de segurança</li>
+</ul>
+<p>Organizações que implementam PCI-DSS corretamente veem benefícios colaterais:</p>
+<ul>
+<li><strong>Redução de 40-60%</strong> no tempo de resposta a incidentes</li>
+<li><strong>Diminuição de 70%</strong> em falsos positivos de segurança (com regras bem configuradas)</li>
+<li><strong>Economia de 30-50%</strong> em investigações manuais (automação)</li>
+<li><strong>Conformidade contínua</strong> em vez de esforço anual</li>
+</ul>
+<p>O <strong>Elastic SIEM</strong> foi construído especificamente para atender a esses requisitos. Este artigo mapeia exatamente como, e por quê.</p>
+<hr/>
+<h2 id="os-requisitos-críticos-do-pci-dss">Os Requisitos Críticos do PCI-DSS<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#os-requisitos-críticos-do-pci-dss" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>O PCI-DSS tem 12 requisitos principais. Três deles são <strong>diretamente suportados pelo Elastic SIEM</strong>:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Requisito</th><th>Foco</th><th>Impacto</th><th>Elastic Coverage</th></tr></thead><tbody><tr><td><strong>Req. 7</strong></td><td>Restringir acesso a dados</td><td>Quem vê o quê?</td><td>RBAC + Kibana</td></tr><tr><td><strong>Req. 10</strong></td><td>Manter e revisar trilhas de auditoria</td><td>O que aconteceu quando?</td><td>Beats + Log aggregation</td></tr><tr><td><strong>Req. 11</strong></td><td>Monitorar e testar segurança</td><td>Está funcionando?</td><td>Detecção + Alertas</td></tr></tbody></table></div>
+<p>Vamos explorar cada um em profundidade.</p>
+<hr/>
+<h2 id="requisito-7-restringir-acesso-a-dados-pci-dss-7173">Requisito 7: Restringir Acesso a Dados (PCI-DSS 7.1–7.3)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#requisito-7-restringir-acesso-a-dados-pci-dss-7173" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="o-que-o-pci-dss-exige">O que o PCI-DSS Exige<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#o-que-o-pci-dss-exige" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<blockquote>
+<p><em>“Restringir acesso a dados de cartões apenas para usuários cuja função requer acesso.”</em></p>
+</blockquote>
+<p>Em outras palavras: <strong>least privilege access</strong>. Nem todo mundo deve ver logs de segurança — apenas quem precisa.</p>
+<h3 id="por-que-importa">Por Que Importa<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#por-que-importa" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Violações de dados frequentemente começam com acesso não autorizado:</p>
+<ul>
+<li>Um funcionário descontente vê dados que não deveria</li>
+<li>Um atacante comprometeu uma conta de baixo privilégio</li>
+<li>Um consultor temporário ficou com acesso após sair</li>
+</ul>
+<p>O PCI-DSS exige que você <strong>prove</strong> que apenas as pessoas certas podem acessar dados sensíveis.</p>
+<h3 id="como-elastic-siem-cobre-rbac">Como Elastic SIEM Cobre (RBAC)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#como-elastic-siem-cobre-rbac" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Elastic fornece <strong>Role-Based Access Control (RBAC)</strong> nativo, permitindo granularidade extrema:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="yaml" data-theme="github-light github-dark"><code data-language="yaml" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Exemplo: Analista de Segurança Júnior</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">Pode ver</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  ✅ Logs de autenticação (SSH logins, falhas)</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  ✅ Alertas de malware detectados</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  ❌ Dados de cartão de crédito</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  ❌ Configurações de compliance</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  ❌ Dados de auditoria da equipe de finança</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Exemplo: Gerente de Compliance</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">Pode ver</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  ✅ Relatórios de conformidade PCI-DSS</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  ✅ Mudanças de configuração (audit log)</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  ✅ Alertas não resolvidos</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  ❌ Payloads técnicos de malware</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  ❌ Configurações de detecção (precisa de admin)</span></span></code></pre></figure>
+<p><strong>Implementação Técnica</strong>:</p>
+<ul>
+<li>Roles definidas no Elasticsearch (<code>_security/role/</code>)</li>
+<li>Políticas de query para filtrar dados por <code>event.dataset</code>, <code>user.role</code>, etc.</li>
+<li>Acesso ao Kibana restrito por aplicação (<code>kibana-.kibana</code>)</li>
+<li>Auditoria completa de quem acessou o quê (logged em <code>.security-audit-logs</code>)</li>
+</ul>
+<h3 id="impacto-no-audit-anual">Impacto no Audit Anual<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#impacto-no-audit-anual" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>Antes (sem RBAC adequado)</strong>:</p>
+<ul>
+<li>Auditor pergunta: “Quantos usuários têm acesso a logs de segurança?”</li>
+<li>Resposta: “Huh… acho que uns 30?”</li>
+<li>Resultado: ❌ Falha na conformidade</li>
+</ul>
+<p><strong>Depois (com Elastic RBAC)</strong>:</p>
+<ul>
+<li>Auditor pergunta: “Prove que apenas os aprovados têm acesso”</li>
+<li>Resposta: “Aqui estão os 5 roles configuradas, as 12 pessoas atribuídas, e o audit log de cada acesso”</li>
+<li>Resultado: ✅ Aprovado</li>
+</ul>
+<hr/>
+<h2 id="requisito-10-trilhas-de-auditoria-pci-dss-102105">Requisito 10: Trilhas de Auditoria (PCI-DSS 10.2–10.5)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#requisito-10-trilhas-de-auditoria-pci-dss-102105" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Este é o <strong>coração do PCI-DSS</strong>. Literalmente: “Você sabe o que aconteceu ontem às 3 da manhã?”</p>
+<h3 id="req-102-registrar-ações-do-usuário">Req. 10.2: Registrar Ações do Usuário<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#req-102-registrar-ações-do-usuário" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<blockquote>
+<p><em>“Implementar mecanismos de logging automáticos para todos os acessos a dados de cartões.”</em></p>
+</blockquote>
+<p>Especificamente, você precisa logar:</p>
+<ul>
+<li>✅ Acesso bem-sucedido e malsucedido a dados sensíveis</li>
+<li>✅ Ações de administrador (mudanças de config)</li>
+<li>✅ Execução de programas críticos</li>
+<li>✅ Mudanças em logs de auditoria</li>
+</ul>
+<h3 id="como-elastic-siem-cobre-auditbeat--filebeat">Como Elastic SIEM Cobre (Auditbeat + Filebeat)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#como-elastic-siem-cobre-auditbeat--filebeat" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>Auditbeat</strong> captura eventos a nível de kernel no Linux:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Exemplo: Auditbeat detecta um login SSH</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">timestamp:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> 2026-04-15T14:32:45Z</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">user.name:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;john.doe&quot;</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">user.id:</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 1001</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">source</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">.ip:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;203.0.113.45&quot;</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">event.action:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;ssh_login&quot;</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">event.outcome:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;success&quot;</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">process.name:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;sshd&quot;</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">host.name:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;prod-db-01&quot;</span></span></code></pre></figure>
+<p><strong>Filebeat</strong> coleta logs do sistema:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Exemplo: Filebeat lê /var/log/auth.log</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">timestamp:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> 2026-04-15T14:32:45Z</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">message:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;Accepted publickey for john.doe from 203.0.113.45 port 54321 ssh2&quot;</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">event.dataset:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;system.auth&quot;</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">event.outcome:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;success&quot;</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">user.name:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;john.doe&quot;</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">source</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">.ip:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;203.0.113.45&quot;</span></span></code></pre></figure>
+<p><strong>Resultado</strong>: Uma trilha completa e imutável de quem fez o quê, quando, e de onde.</p>
+<h3 id="req-105-proteger-logs-de-alteração-não-autorizada">Req. 10.5: Proteger Logs de Alteração Não Autorizada<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#req-105-proteger-logs-de-alteração-não-autorizada" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<blockquote>
+<p><em>“Logs devem ser protegidos contra alteração ou exclusão, e retenção deve ser >= 12 meses.”</em></p>
+</blockquote>
+<p>Este é o <strong>desafio real</strong>. Qualquer pessoa com <code>root</code> pode deletar logs. Como você impede isso?</p>
+<p><strong>Resposta: Index Lifecycle Management (ILM) + Immutability</strong></p>
+<h3 id="como-elastic-siem-cobre-ilm-policy">Como Elastic SIEM Cobre (ILM Policy)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#como-elastic-siem-cobre-ilm-policy" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Elastic oferece <strong>políticas automáticas de ciclo de vida</strong> que garantem:</p>
+<ol>
+<li>
+<p><strong>Hot Phase (0–30 dias)</strong>: Índices otimizados para escrita</p>
+<ul>
+<li>Novos eventos chegam aqui</li>
+<li>Performance máxima</li>
+<li>Suporta busca em tempo real</li>
+</ul>
+</li>
+<li>
+<p><strong>Warm Phase (30–90 dias)</strong>: Otimizado para leitura</p>
+<ul>
+<li>Forcemerge reduz segmentos (mais eficiente)</li>
+<li>Pode ser movido para storage mais barato</li>
+<li>Ainda buscável</li>
+</ul>
+</li>
+<li>
+<p><strong>Cold Phase (90–365 dias)</strong>: Arquivo imutável</p>
+<ul>
+<li><strong>FREEZE</strong>: Índices congelados, zero mutação possível</li>
+<li>Nenhum usuário (nem root) pode deletar ou modificar</li>
+<li>Ainda buscável se necessário</li>
+<li>Storage muito barato</li>
+</ul>
+</li>
+<li>
+<p><strong>Delete Phase (365+ dias)</strong>: Automática</p>
+<ul>
+<li>Deleta após 12 meses (ou conforme política)</li>
+<li>Retenção controlada, não ad-hoc</li>
+</ul>
+</li>
+</ol>
+<p><strong>Implementação</strong>:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="json" data-theme="github-light github-dark"><code data-language="json" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">{</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  &quot;policy&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;pci-logs-12month&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  &quot;phases&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: {</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">    &quot;hot&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: {</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">      &quot;min_age&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;0ms&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">      &quot;actions&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: {</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">        &quot;rollover&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">&quot;max_age&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;30d&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">&quot;max_primary_shard_size&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;50gb&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    },</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">    &quot;warm&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: {</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">      &quot;min_age&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;3d&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">      &quot;actions&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: {</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">        &quot;allocate&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">&quot;require&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">&quot;data&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;warm&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> } },</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">        &quot;forcemerge&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">&quot;max_num_segments&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">1</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    },</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">    &quot;cold&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: {</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">      &quot;min_age&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;90d&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">      &quot;actions&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: {</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">        &quot;allocate&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">&quot;require&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">&quot;data&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;cold&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> } },</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">        &quot;freeze&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: {}</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    },</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">    &quot;delete&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: {</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">      &quot;min_age&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;365d&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">      &quot;actions&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">&quot;delete&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: {} }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">}</span></span></code></pre></figure>
+<p><strong>Por que isso importa para compliance</strong>:</p>
+<ul>
+<li>Auditor: “Os logs foram alterados nos últimos 12 meses?”</li>
+<li>Você: “Não, a política ILM garante imutabilidade automática”</li>
+<li>Auditor: “Posso ver evidência?”</li>
+<li>Você: “Sim, aqui está o hash do índice congelado e o registro de quem tentou modificar”</li>
+</ul>
+<h3 id="req-104-revisar-logs-regularmente">Req. 10.4: Revisar Logs Regularmente<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#req-104-revisar-logs-regularmente" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<blockquote>
+<p><em>“Revisar todos os logs de acesso a dados de cartões diariamente.”</em></p>
+</blockquote>
+<p>Ninguém quer revisar 50GB de logs por dia manualmente.</p>
+<p><strong>Como Elastic SIEM Cobre (Alertas + Dashboards)</strong>:</p>
+<ul>
+<li>Regras de detecção <strong>automaticamente</strong> sinalizam anomalias</li>
+<li>Dashboards resumem eventos críticos</li>
+<li>Alertas em tempo real (via email, Slack, PagerDuty)</li>
+</ul>
+<p><strong>Exemplo</strong>:</p>
+<ul>
+<li>Regra: “10 tentativas de login SSH falhadas em 15 segundos”</li>
+<li>Resultado: Alerta automático + investigação assistida</li>
+</ul>
+<hr/>
+<h2 id="requisito-11-monitorar-e-testar-segurança-pci-dss-111115">Requisito 11: Monitorar e Testar Segurança (PCI-DSS 11.1–11.5)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#requisito-11-monitorar-e-testar-segurança-pci-dss-111115" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="o-que-o-pci-dss-exige-1">O que o PCI-DSS Exige<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#o-que-o-pci-dss-exige-1" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<blockquote>
+<p><em>“Implementar processos para monitorar e testar regularmente a eficácia dos controles de segurança.”</em></p>
+</blockquote>
+<p>Em tradução livre: “Prove que sua segurança está funcionando, não só implementada.”</p>
+<h3 id="req-113-testes-de-penetração-anuais">Req. 11.3: Testes de Penetração Anuais<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#req-113-testes-de-penetração-anuais" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Você precisa fazer pen-tests anualmente e demonstrar que:</p>
+<ul>
+<li>✅ Vulnerabilidades conhecidas foram corrigidas</li>
+<li>✅ Novos controles estão funcionando</li>
+<li>✅ Resposta a incidentes é rápida</li>
+</ul>
+<h3 id="req-115-monitoramento-de-integridade-de-arquivos">Req. 11.5: Monitoramento de Integridade de Arquivos<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#req-115-monitoramento-de-integridade-de-arquivos" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<blockquote>
+<p><em>“Implementar um mecanismo de detecção de mudanças para notificar sobre alterações não autorizadas em arquivos críticos.”</em></p>
+</blockquote>
+<p>Arquivos críticos: <code>/etc</code>, <code>/bin</code>, <code>/sbin</code>, diretórios de aplicação de pagamento.</p>
+<h3 id="como-elastic-siem-cobre-file-integrity-module">Como Elastic SIEM Cobre (File Integrity Module)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#como-elastic-siem-cobre-file-integrity-module" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>Auditbeat tem um módulo nativo</strong> que monitora mudanças de arquivo:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="yaml" data-theme="github-light github-dark"><code data-language="yaml" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">auditbeat.modules</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  - </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">module</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">file_integrity</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    paths</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      - </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">/etc</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">                    # Configurações do sistema</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      - </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">/bin</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      - </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">/sbin</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      - </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">/usr/sbin</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      - </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">/opt/payment-app</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">        # Aplicação de pagamento</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    scan_rate_per_sec</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">50MiB</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    max_file_size</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">100MiB</span></span></code></pre></figure>
+<p><strong>Eventos gerados</strong>:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="json" data-theme="github-light github-dark"><code data-language="json" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">{</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  &quot;event.action&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;updated&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  &quot;file.path&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;/etc/shadow&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  &quot;file.hash.sha256&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;d4f5c6e7...&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  &quot;file.mode.mode&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;0000&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  &quot;message&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;/etc/shadow was modified&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  &quot;event.outcome&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;success&quot;</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">}</span></span></code></pre></figure>
+<p><strong>Alerta automático</strong>: Uma regra de detecção pode sinalizar mudanças não autorizadas:</p>
+<ul>
+<li>Admin esperava a mudança? → Ligar para confirmar</li>
+<li>Ninguém esperava? → Investigar imediatamente (possível breach)</li>
+</ul>
+<hr/>
+<h2 id="a-junção-ilm-como-enabler-de-conformidade-contínua">A Junção: ILM como Enabler de Conformidade Contínua<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#a-junção-ilm-como-enabler-de-conformidade-contínua" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Aqui está o que <strong>diferencia Elastic SIEM</strong> de soluções ad-hoc:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Componente</th><th>Sem SIEM</th><th>Com Elastic SIEM</th></tr></thead><tbody><tr><td><strong>Logging</strong></td><td>Cada sistema loga diferente</td><td>Unified via Beats</td></tr><tr><td><strong>Retenção</strong></td><td>Cron job manual (frágil)</td><td><strong>ILM automático</strong> (robusto)</td></tr><tr><td><strong>Imutabilidade</strong></td><td>Torcer para ninguém mexer</td><td><strong>Freeze automático</strong> (garantido)</td></tr><tr><td><strong>Auditoria</strong></td><td>Logs de acesso (se houver)</td><td><strong>Audit trail completo</strong> em Elasticsearch</td></tr><tr><td><strong>Detecção</strong></td><td>Nada automático</td><td><strong>Regras de detecção</strong> 24/7</td></tr><tr><td><strong>Investigação</strong></td><td>Buscar em vários logs</td><td><strong>Kibana correlação</strong></td></tr></tbody></table></div>
+<hr/>
+<h2 id="matriz-requisito--elastic-feature--roi">Matriz: Requisito → Elastic Feature → ROI<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#matriz-requisito--elastic-feature--roi" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Requisito</th><th>O que Precisa</th><th>Feature Elastic</th><th>Resultado</th></tr></thead><tbody><tr><td><strong>Req. 7</strong></td><td>Acesso restrito</td><td>RBAC + Kibana</td><td>✅ Compliance auditável</td></tr><tr><td><strong>Req. 10.2</strong></td><td>Logs completos</td><td>Auditbeat + Filebeat</td><td>✅ Trilha de 100% dos eventos</td></tr><tr><td><strong>Req. 10.5</strong></td><td>Imutabilidade 12 meses</td><td>ILM + Freeze</td><td>✅ Impossível falsificar logs</td></tr><tr><td><strong>Req. 11.5</strong></td><td>Detecção de mudanças</td><td>File Integrity Module</td><td>✅ Alertas automáticos</td></tr></tbody></table></div>
+<hr/>
+<h2 id="o-caso-de-negócio-por-que-investir-em-elastic-siem">O Caso de Negócio: Por Que Investir em Elastic SIEM<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#o-caso-de-negócio-por-que-investir-em-elastic-siem" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="cenário-1-sem-elastic-siem-ferramentas-tradicionais">Cenário 1: Sem Elastic SIEM (Ferramentas Tradicionais)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#cenário-1-sem-elastic-siem-ferramentas-tradicionais" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>Custo anual:
+- Syslog server + storage: $30k
+- Splunk licenses: $150k
+- Gerenciamento manual: 2 FTEs × $150k = $300k
+- Pen-test anual: $50k
+- Multa por falha de compliance: $100k/dia × 1 dia = $100k (assumindo 1 dia de falha/ano)
+────────────────────
+TOTAL: ~$630k/ano
+</code></pre>
+<p><strong>Problemas</strong>:</p>
+<ul>
+<li>Logs em múltiplos lugares (não auditáveis)</li>
+<li>Retenção manual (frágil)</li>
+<li>Busca lenta (investigações lentas)</li>
+<li>Alertas limitados (reativo vs proativo)</li>
+</ul>
+<h3 id="cenário-2-com-elastic-siem">Cenário 2: Com Elastic SIEM<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#cenário-2-com-elastic-siem" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<pre><code>Custo anual:
+- Elastic Cloud (SaaS): $60k
+- Gerenciamento: 1 FTE × $150k = $150k
+- Pen-test (mais confiante agora): $30k
+- Multa evitada: $0
+────────────────────
+TOTAL: ~$240k/ano
+</code></pre>
+<p><strong>Benefícios</strong>:</p>
+<ul>
+<li>Logs centralizados + auditáveis</li>
+<li>Retenção automática</li>
+<li>Busca rápida (investigação em minutos)</li>
+<li>Detecção proativa (menos incidentes)</li>
+</ul>
+<p><strong>ROI</strong>: ~60% economia anual + redução de risco de breach</p>
+<hr/>
+<h2 id="implementação-prática-passo-a-passo">Implementação Prática: Passo-a-Passo<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#implementação-prática-passo-a-passo" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="1-avaliação-do-requisito-atual">1. Avaliação do Requisito Atual<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#1-avaliação-do-requisito-atual" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Pergunta-chave: Onde estão seus logs hoje?</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">-</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> SSH</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> logs:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /var/log/auth.log</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> (disperso </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">por</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> hosts</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">-</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> App</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> logs:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /var/log/myapp.log</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> (onde </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">está?</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">-</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> DB</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> logs:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> Oracle</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> audit</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> trail</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> (como </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">acesso?</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">-</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> Cambio</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> de</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> config:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> Espera,</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> não</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> tem</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> log?</span></span></code></pre></figure>
+<p><strong>Resposta esperada com Elastic</strong>:</p>
+<pre><code>Tudo em um único índice (ou namespace de índices) no Elasticsearch
+Buscável
+Imutável após 90 dias
+Auditável (quem acessou quê)
+</code></pre>
+<h3 id="2-definir-política-ilm">2. Definir Política ILM<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#2-definir-política-ilm" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="yaml" data-theme="github-light github-dark"><code data-language="yaml" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># pci-logs-12month.json</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">{</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  &quot;policy&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: {</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">    &quot;phases&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: {</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      &quot;hot&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: {</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">        &quot;min_age&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;0ms&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">,</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">        &quot;actions&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: {</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">          &quot;rollover&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: { </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;max_age&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;30d&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;max_primary_shard_size&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;50gb&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">        }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      },</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      &quot;warm&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: { </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;min_age&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;3d&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">...</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> },</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      &quot;cold&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: { </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;min_age&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;90d&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;actions&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: { </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;freeze&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: {} } },</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      &quot;delete&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: { </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;min_age&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;365d&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;actions&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: { </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;delete&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: {} } }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">    }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">}</span></span></code></pre></figure>
+<p>Aplicar a todos os índices PCI: <code>auditbeat-pci-*</code>, <code>filebeat-pci-*</code>, etc.</p>
+<h3 id="3-configurar-rbac">3. Configurar RBAC<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#3-configurar-rbac" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">POST</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> _security/role/compliance_officer_pci</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">{</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">  &quot;cluster&quot;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">:</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> [],</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">  &quot;indices&quot;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">:</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> [{</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">    &quot;names&quot;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">:</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> [</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;auditbeat-pci-*&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;filebeat-pci-*&quot;],</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">    &quot;privileges&quot;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">:</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> [</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;read&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;view_index_metadata&quot;]</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  }],</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">  &quot;applications&quot;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">:</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> [{</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">    &quot;application&quot;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;kibana-.kibana&quot;,</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">    &quot;privileges&quot;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">:</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> [</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;feature_discover.read&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">, </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;feature_dashboard.read&quot;],</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">    &quot;resources&quot;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">:</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> [</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;*&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">]</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  }]</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">}</span></span></code></pre></figure>
+<h3 id="4-criar-dashboards-e-alertas">4. Criar Dashboards e Alertas<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#4-criar-dashboards-e-alertas" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>Dashboard Compliance Diário</strong>:</p>
+<ul>
+<li>Eventos de autenticação (logins bem-sucedidos/falhados)</li>
+<li>Mudanças de arquivo em diretórios críticos</li>
+<li>Atividade de usuários privilegiados</li>
+<li>Alertas disparados (e resolvidos)</li>
+</ul>
+<p><strong>Alertas Automáticos</strong>:</p>
+<ul>
+<li>5+ tentativas de login falhadas em 10 minutos → Escalate</li>
+<li>Mudança em <code>/etc/passwd</code> → Investigar</li>
+<li>Acesso a dados de cartão por usuário não autorizado → Bloquear</li>
+</ul>
+<hr/>
+<h2 id="validação-teste-seu-compliance">Validação: Teste Seu Compliance<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#validação-teste-seu-compliance" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="exercício-simulação-de-auditoria">Exercício: Simulação de Auditoria<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#exercício-simulação-de-auditoria" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 1. Gere logs fake</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">for</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> i </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">in</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> {</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">1..100}</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">; </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">do</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  echo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;$(</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">date</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">) - Simulated login attempt&quot;</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> >></span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /var/log/auth.log</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">done</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 2. Verifique se Filebeat capturou</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">GET</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> filebeat-pci-</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">*</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">/_search</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">{</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">  &quot;query&quot;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> {</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;match&quot;:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> {</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;message&quot;:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;Simulated&quot;</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> }</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">}</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 3. Confirme imutabilidade</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">GET</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> auditbeat-pci-</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">*</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">/_ilm/explain</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Deve mostrar: &quot;step&quot;: &quot;complete&quot;  (cold phase congelado)</span></span></code></pre></figure>
+<hr/>
+<h2 id="conclusão-de-checkbox-para-vantagem-competitiva">Conclusão: De Checkbox para Vantagem Competitiva<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#conclusão-de-checkbox-para-vantagem-competitiva" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>PCI-DSS começou como um “checkbox” — conformidade ou multa. Mas organizações sofisticadas transformaram em <strong>vantagem competitiva</strong>:</p>
+<ul>
+<li><strong>Confiança do cliente</strong>: “Seu sistema realmente é seguro?”  → “Sim, auditado por PCI-DSS”</li>
+<li><strong>Redução de risco</strong>: Menos breaches = menos crisis response</li>
+<li><strong>Eficiência operacional</strong>: Automação reduz manual work</li>
+<li><strong>Velocidade de resposta</strong>: Incidentes resolvidos em horas, não dias</li>
+</ul>
+<p><strong>Elastic SIEM</strong> fornece a infraestrutura para fazer isso <strong>não como um projeto anual</strong>, mas como <strong>conformidade contínua</strong>.</p>
+<p>O resultado?</p>
+<ul>
+<li>✅ Auditor feliz (compliance comprovada)</li>
+<li>✅ CISO feliz (visibilidade 24/7)</li>
+<li>✅ CFO feliz (ROI claro)</li>
+<li>✅ Clientes felizes (segurança confiável)</li>
+</ul>
+<hr/>
+<h2 id="referências">Referências<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#referências" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ol>
+<li><a href="https://www.pcisecuritystandards.org/document_library/" class="external">PCI DSS v4.0 — Official Requirements<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li><a href="https://www.elastic.co/security" class="external">Elastic SIEM Documentation<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li><a href="https://www.elastic.co/docs/manage-data/lifecycle/" class="external">Index Lifecycle Management — Best Practices<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li><a href="https://www.elastic.co/docs/deploy-manage/users-roles/cloud-enterprise-orchestrator/manage-users-roles" class="external">RBAC em Elasticsearch<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li>Artigo relacionado: <a href="../../Elastic/Security/Monitoramento_de_Segurança_para_Conformidade_com_PCI-DSS" class="internal alias" data-slug="Elastic/Security/Monitoramento_de_Segurança_para_Conformidade_com_PCI-DSS">Monitoramento de Segurança para Conformidade com PCI-DSS</a></li>
+<li>Artigo relacionado: <a href="../../Elastic/Security/fleet-server-vs-beats-autonomos" class="internal alias" data-slug="Elastic/Security/fleet-server-vs-beats-autonomos">Fleet Server vs Beats Autônomos</a></li>
+</ol></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="graph"><h3>Graph View</h3><div class="graph-outer"><div class="graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:1,&quot;scale&quot;:1.1,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.3,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:false,&quot;enableRadial&quot;:false}"></div><button class="global-graph-icon" aria-label="Global Graph"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55 55" fill="currentColor" xml:space="preserve"><path d="M49,0c-3.309,0-6,2.691-6,6c0,1.035,0.263,2.009,0.726,2.86l-9.829,9.829C32.542,17.634,30.846,17,29,17
+                s-3.542,0.634-4.898,1.688l-7.669-7.669C16.785,10.424,17,9.74,17,9c0-2.206-1.794-4-4-4S9,6.794,9,9s1.794,4,4,4
+                c0.74,0,1.424-0.215,2.019-0.567l7.669,7.669C21.634,21.458,21,23.154,21,25s0.634,3.542,1.688,4.897L10.024,42.562
+                C8.958,41.595,7.549,41,6,41c-3.309,0-6,2.691-6,6s2.691,6,6,6s6-2.691,6-6c0-1.035-0.263-2.009-0.726-2.86l12.829-12.829
+                c1.106,0.86,2.44,1.436,3.898,1.619v10.16c-2.833,0.478-5,2.942-5,5.91c0,3.309,2.691,6,6,6s6-2.691,6-6c0-2.967-2.167-5.431-5-5.91
+                v-10.16c1.458-0.183,2.792-0.759,3.898-1.619l7.669,7.669C41.215,39.576,41,40.26,41,41c0,2.206,1.794,4,4,4s4-1.794,4-4
+                s-1.794-4-4-4c-0.74,0-1.424,0.215-2.019,0.567l-7.669-7.669C36.366,28.542,37,26.846,37,25s-0.634-3.542-1.688-4.897l9.665-9.665
+                C46.042,11.405,47.451,12,49,12c3.309,0,6-2.691,6-6S52.309,0,49,0z M11,9c0-1.103,0.897-2,2-2s2,0.897,2,2s-0.897,2-2,2
+                S11,10.103,11,9z M6,51c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S8.206,51,6,51z M33,49c0,2.206-1.794,4-4,4s-4-1.794-4-4
+                s1.794-4,4-4S33,46.794,33,49z M29,31c-3.309,0-6-2.691-6-6s2.691-6,6-6s6,2.691,6,6S32.309,31,29,31z M47,41c0,1.103-0.897,2-2,2
+                s-2-0.897-2-2s0.897-2,2-2S47,39.897,47,41z M49,10c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S51.206,10,49,10z"></path></svg></button></div><div class="global-graph-outer"><div class="global-graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:-1,&quot;scale&quot;:0.9,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.2,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:true,&quot;enableRadial&quot;:true}"></div></div></div><div class="toc desktop-only"><button type="button" class="toc-header" aria-controls="toc-28" aria-expanded="true"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-1" class="toc-content overflow"><li class="depth-0"><a href="#como-o-elastic-siem-atende-aos-requisitos-críticos-do-pci-dss" data-for="como-o-elastic-siem-atende-aos-requisitos-críticos-do-pci-dss">Como o Elastic SIEM Atende aos Requisitos Críticos do PCI-DSS</a></li><li class="depth-1"><a href="#introdução-por-que-pci-dss-importa" data-for="introdução-por-que-pci-dss-importa">Introdução: Por Que PCI-DSS Importa</a></li><li class="depth-1"><a href="#os-requisitos-críticos-do-pci-dss" data-for="os-requisitos-críticos-do-pci-dss">Os Requisitos Críticos do PCI-DSS</a></li><li class="depth-1"><a href="#requisito-7-restringir-acesso-a-dados-pci-dss-7173" data-for="requisito-7-restringir-acesso-a-dados-pci-dss-7173">Requisito 7: Restringir Acesso a Dados (PCI-DSS 7.1–7.3)</a></li><li class="depth-2"><a href="#o-que-o-pci-dss-exige" data-for="o-que-o-pci-dss-exige">O que o PCI-DSS Exige</a></li><li class="depth-2"><a href="#por-que-importa" data-for="por-que-importa">Por Que Importa</a></li><li class="depth-2"><a href="#como-elastic-siem-cobre-rbac" data-for="como-elastic-siem-cobre-rbac">Como Elastic SIEM Cobre (RBAC)</a></li><li class="depth-2"><a href="#impacto-no-audit-anual" data-for="impacto-no-audit-anual">Impacto no Audit Anual</a></li><li class="depth-1"><a href="#requisito-10-trilhas-de-auditoria-pci-dss-102105" data-for="requisito-10-trilhas-de-auditoria-pci-dss-102105">Requisito 10: Trilhas de Auditoria (PCI-DSS 10.2–10.5)</a></li><li class="depth-2"><a href="#req-102-registrar-ações-do-usuário" data-for="req-102-registrar-ações-do-usuário">Req. 10.2: Registrar Ações do Usuário</a></li><li class="depth-2"><a href="#como-elastic-siem-cobre-auditbeat--filebeat" data-for="como-elastic-siem-cobre-auditbeat--filebeat">Como Elastic SIEM Cobre (Auditbeat + Filebeat)</a></li><li class="depth-2"><a href="#req-105-proteger-logs-de-alteração-não-autorizada" data-for="req-105-proteger-logs-de-alteração-não-autorizada">Req. 10.5: Proteger Logs de Alteração Não Autorizada</a></li><li class="depth-2"><a href="#como-elastic-siem-cobre-ilm-policy" data-for="como-elastic-siem-cobre-ilm-policy">Como Elastic SIEM Cobre (ILM Policy)</a></li><li class="depth-2"><a href="#req-104-revisar-logs-regularmente" data-for="req-104-revisar-logs-regularmente">Req. 10.4: Revisar Logs Regularmente</a></li><li class="depth-1"><a href="#requisito-11-monitorar-e-testar-segurança-pci-dss-111115" data-for="requisito-11-monitorar-e-testar-segurança-pci-dss-111115">Requisito 11: Monitorar e Testar Segurança (PCI-DSS 11.1–11.5)</a></li><li class="depth-2"><a href="#o-que-o-pci-dss-exige-1" data-for="o-que-o-pci-dss-exige-1">O que o PCI-DSS Exige</a></li><li class="depth-2"><a href="#req-113-testes-de-penetração-anuais" data-for="req-113-testes-de-penetração-anuais">Req. 11.3: Testes de Penetração Anuais</a></li><li class="depth-2"><a href="#req-115-monitoramento-de-integridade-de-arquivos" data-for="req-115-monitoramento-de-integridade-de-arquivos">Req. 11.5: Monitoramento de Integridade de Arquivos</a></li><li class="depth-2"><a href="#como-elastic-siem-cobre-file-integrity-module" data-for="como-elastic-siem-cobre-file-integrity-module">Como Elastic SIEM Cobre (File Integrity Module)</a></li><li class="depth-1"><a href="#a-junção-ilm-como-enabler-de-conformidade-contínua" data-for="a-junção-ilm-como-enabler-de-conformidade-contínua">A Junção: ILM como Enabler de Conformidade Contínua</a></li><li class="depth-1"><a href="#matriz-requisito--elastic-feature--roi" data-for="matriz-requisito--elastic-feature--roi">Matriz: Requisito → Elastic Feature → ROI</a></li><li class="depth-1"><a href="#o-caso-de-negócio-por-que-investir-em-elastic-siem" data-for="o-caso-de-negócio-por-que-investir-em-elastic-siem">O Caso de Negócio: Por Que Investir em Elastic SIEM</a></li><li class="depth-2"><a href="#cenário-1-sem-elastic-siem-ferramentas-tradicionais" data-for="cenário-1-sem-elastic-siem-ferramentas-tradicionais">Cenário 1: Sem Elastic SIEM (Ferramentas Tradicionais)</a></li><li class="depth-2"><a href="#cenário-2-com-elastic-siem" data-for="cenário-2-com-elastic-siem">Cenário 2: Com Elastic SIEM</a></li><li class="depth-1"><a href="#implementação-prática-passo-a-passo" data-for="implementação-prática-passo-a-passo">Implementação Prática: Passo-a-Passo</a></li><li class="depth-2"><a href="#1-avaliação-do-requisito-atual" data-for="1-avaliação-do-requisito-atual">1. Avaliação do Requisito Atual</a></li><li class="depth-2"><a href="#2-definir-política-ilm" data-for="2-definir-política-ilm">2. Definir Política ILM</a></li><li class="depth-2"><a href="#3-configurar-rbac" data-for="3-configurar-rbac">3. Configurar RBAC</a></li><li class="depth-2"><a href="#4-criar-dashboards-e-alertas" data-for="4-criar-dashboards-e-alertas">4. Criar Dashboards e Alertas</a></li><li class="depth-1"><a href="#validação-teste-seu-compliance" data-for="validação-teste-seu-compliance">Validação: Teste Seu Compliance</a></li><li class="depth-2"><a href="#exercício-simulação-de-auditoria" data-for="exercício-simulação-de-auditoria">Exercício: Simulação de Auditoria</a></li><li class="depth-1"><a href="#conclusão-de-checkbox-para-vantagem-competitiva" data-for="conclusão-de-checkbox-para-vantagem-competitiva">Conclusão: De Checkbox para Vantagem Competitiva</a></li><li class="depth-1"><a href="#referências" data-for="referências">Referências</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v4.5.2</a> © 2026</p><ul><li><a href="https://github.com/jackyzha0/quartz">GitHub</a></li><li><a href="https://discord.gg/cRFFHYye7t">Discord Community</a></li></ul></footer></div></div></body><script type="application/javascript" data-persist="true">function n(){let t=this.parentElement;t.classList.toggle("is-collapsed");let e=t.getElementsByClassName("callout-content")[0];if(!e)return;let l=t.classList.contains("is-collapsed");e.style.gridTemplateRows=l?"0fr":"1fr"}function c(){let t=document.getElementsByClassName("callout is-collapsible");for(let e of t){let l=e.getElementsByClassName("callout-title")[0],s=e.getElementsByClassName("callout-content")[0];if(!l||!s)continue;l.addEventListener("click",n),window.addCleanup(()=>l.removeEventListener("click",n));let o=e.classList.contains("is-collapsed");s.style.gridTemplateRows=o?"0fr":"1fr"}}document.addEventListener("nav",c);
+</script><script type="module" data-persist="true">function E(a,e){if(!a)return;function t(o){o.target===this&&(o.preventDefault(),o.stopPropagation(),e())}function n(o){o.key.startsWith("Esc")&&(o.preventDefault(),e())}a?.addEventListener("click",t),window.addCleanup(()=>a?.removeEventListener("click",t)),document.addEventListener("keydown",n),window.addCleanup(()=>document.removeEventListener("keydown",n))}function f(a){for(;a.firstChild;)a.removeChild(a.firstChild)}var m=class{constructor(e,t){this.container=e;this.content=t;this.setupEventListeners(),this.setupNavigationControls(),this.resetTransform()}isDragging=!1;startPan={x:0,y:0};currentPan={x:0,y:0};scale=1;MIN_SCALE=.5;MAX_SCALE=3;cleanups=[];setupEventListeners(){let e=this.onMouseDown.bind(this),t=this.onMouseMove.bind(this),n=this.onMouseUp.bind(this),o=this.onTouchStart.bind(this),r=this.onTouchMove.bind(this),i=this.onTouchEnd.bind(this),s=this.resetTransform.bind(this);this.container.addEventListener("mousedown",e),document.addEventListener("mousemove",t),document.addEventListener("mouseup",n),this.container.addEventListener("touchstart",o,{passive:!1}),document.addEventListener("touchmove",r,{passive:!1}),document.addEventListener("touchend",i),window.addEventListener("resize",s),this.cleanups.push(()=>this.container.removeEventListener("mousedown",e),()=>document.removeEventListener("mousemove",t),()=>document.removeEventListener("mouseup",n),()=>this.container.removeEventListener("touchstart",o),()=>document.removeEventListener("touchmove",r),()=>document.removeEventListener("touchend",i),()=>window.removeEventListener("resize",s))}cleanup(){for(let e of this.cleanups)e()}setupNavigationControls(){let e=document.createElement("div");e.className="mermaid-controls";let t=this.createButton("+",()=>this.zoom(.1)),n=this.createButton("-",()=>this.zoom(-.1)),o=this.createButton("Reset",()=>this.resetTransform());e.appendChild(n),e.appendChild(o),e.appendChild(t),this.container.appendChild(e)}createButton(e,t){let n=document.createElement("button");return n.textContent=e,n.className="mermaid-control-button",n.addEventListener("click",t),window.addCleanup(()=>n.removeEventListener("click",t)),n}onMouseDown(e){e.button===0&&(this.isDragging=!0,this.startPan={x:e.clientX-this.currentPan.x,y:e.clientY-this.currentPan.y},this.container.style.cursor="grabbing")}onMouseMove(e){this.isDragging&&(e.preventDefault(),this.currentPan={x:e.clientX-this.startPan.x,y:e.clientY-this.startPan.y},this.updateTransform())}onMouseUp(){this.isDragging=!1,this.container.style.cursor="grab"}onTouchStart(e){if(e.touches.length!==1)return;this.isDragging=!0;let t=e.touches[0];this.startPan={x:t.clientX-this.currentPan.x,y:t.clientY-this.currentPan.y}}onTouchMove(e){if(!this.isDragging||e.touches.length!==1)return;e.preventDefault();let t=e.touches[0];this.currentPan={x:t.clientX-this.startPan.x,y:t.clientY-this.startPan.y},this.updateTransform()}onTouchEnd(){this.isDragging=!1}zoom(e){let t=Math.min(Math.max(this.scale+e,this.MIN_SCALE),this.MAX_SCALE),n=this.content.getBoundingClientRect(),o=n.width/2,r=n.height/2,i=t-this.scale;this.currentPan.x-=o*i,this.currentPan.y-=r*i,this.scale=t,this.updateTransform()}updateTransform(){this.content.style.transform=`translate(${this.currentPan.x}px, ${this.currentPan.y}px) scale(${this.scale})`}resetTransform(){let t=this.content.querySelector("svg").getBoundingClientRect(),n=t.width/this.scale,o=t.height/this.scale;this.scale=1,this.currentPan={x:(this.container.clientWidth-n)/2,y:(this.container.clientHeight-o)/2},this.updateTransform()}},T=["--secondary","--tertiary","--gray","--light","--lightgray","--highlight","--dark","--darkgray","--codeFont"],y;document.addEventListener("nav",async()=>{let e=document.querySelector(".center").querySelectorAll("code.mermaid");if(e.length===0)return;y||=await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs");let t=y.default,n=new WeakMap;for(let r of e)n.set(r,r.innerText);async function o(){for(let s of e){s.removeAttribute("data-processed");let c=n.get(s);c&&(s.innerHTML=c)}let r=T.reduce((s,c)=>(s[c]=window.getComputedStyle(document.documentElement).getPropertyValue(c),s),{}),i=document.documentElement.getAttribute("saved-theme")==="dark";t.initialize({startOnLoad:!1,securityLevel:"loose",theme:i?"dark":"base",themeVariables:{fontFamily:r["--codeFont"],primaryColor:r["--light"],primaryTextColor:r["--darkgray"],primaryBorderColor:r["--tertiary"],lineColor:r["--darkgray"],secondaryColor:r["--secondary"],tertiaryColor:r["--tertiary"],clusterBkg:r["--light"],edgeLabelBackground:r["--highlight"]}}),await t.run({nodes:e})}await o(),document.addEventListener("themechange",o),window.addCleanup(()=>document.removeEventListener("themechange",o));for(let r=0;r<e.length;r++){let v=function(){let g=l.querySelector("#mermaid-space"),h=l.querySelector(".mermaid-content");if(!h)return;f(h);let w=i.querySelector("svg").cloneNode(!0);h.appendChild(w),l.classList.add("active"),g.style.cursor="grab",u=new m(g,h)},M=function(){l.classList.remove("active"),u?.cleanup(),u=null},i=e[r],s=i.parentElement,c=s.querySelector(".clipboard-button"),d=s.querySelector(".expand-button"),p=window.getComputedStyle(c),L=c.offsetWidth+parseFloat(p.marginLeft||"0")+parseFloat(p.marginRight||"0");d.style.right=`calc(${L}px + 0.3rem)`,s.prepend(d);let l=s.querySelector("#mermaid-container");if(!l)return;let u=null;d.addEventListener("click",v),E(l,M),window.addCleanup(()=>{u?.cleanup(),d.removeEventListener("click",v)})}});
+</script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../../postscript.js" type="module" data-persist="true"></script></html>

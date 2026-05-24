@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr"><head><title>Analise de vulnerabildade com Trivy</title><meta charset="utf-8"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="Quartz 4"/><meta property="og:title" content="Analise de vulnerabildade com Trivy"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="Analise de vulnerabildade com Trivy"/><meta name="twitter:description" content="O scanner de imagens é um componente crucial do DevSecOps (Desenvolvimento, Segurança e Operações) porque ajuda a identificar e mitigar vulnerabilidades de segurança em aplicativos em contêiner e suas dependências."/><meta property="og:description" content="O scanner de imagens é um componente crucial do DevSecOps (Desenvolvimento, Segurança e Operações) porque ajuda a identificar e mitigar vulnerabilidades de segurança em aplicativos em contêiner e suas dependências."/><meta property="og:image:alt" content="O scanner de imagens é um componente crucial do DevSecOps (Desenvolvimento, Segurança e Operações) porque ajuda a identificar e mitigar vulnerabilidades de segurança em aplicativos em contêiner e suas dependências."/><meta property="twitter:domain" content="quartz.jzhao.xyz"/><meta property="og:url" content="https://quartz.jzhao.xyz/Analise_de_vulnerabildade_DevSecOps_trivy"/><meta property="twitter:url" content="https://quartz.jzhao.xyz/Analise_de_vulnerabildade_DevSecOps_trivy"/><link rel="icon" href="./static/icon.png"/><meta name="description" content="O scanner de imagens é um componente crucial do DevSecOps (Desenvolvimento, Segurança e Operações) porque ajuda a identificar e mitigar vulnerabilidades de segurança em aplicativos em contêiner e suas dependências."/><meta name="generator" content="Quartz"/><link href="./index.css" rel="stylesheet" type="text/css" data-persist="true"/><style>.expand-button {
+  position: absolute;
+  display: flex;
+  float: right;
+  padding: 0.4rem;
+  margin: 0.3rem;
+  right: 0;
+  color: var(--gray);
+  border-color: var(--dark);
+  background-color: var(--light);
+  border: 1px solid;
+  border-radius: 5px;
+  opacity: 0;
+  transition: 0.2s;
+}
+.expand-button > svg {
+  fill: var(--light);
+  filter: contrast(0.3);
+}
+.expand-button:hover {
+  cursor: pointer;
+  border-color: var(--secondary);
+}
+.expand-button:focus {
+  outline: 0;
+}
+
+pre:hover > .expand-button {
+  opacity: 1;
+  transition: 0.2s;
+}
+
+#mermaid-container {
+  position: fixed;
+  contain: layout;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: none;
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.5);
+}
+#mermaid-container.active {
+  display: inline-block;
+}
+#mermaid-container > #mermaid-space {
+  border: 1px solid var(--lightgray);
+  background-color: var(--light);
+  border-radius: 5px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 80vh;
+  width: 80vw;
+  overflow: hidden;
+}
+#mermaid-container > #mermaid-space > .mermaid-content {
+  position: relative;
+  transform-origin: 0 0;
+  transition: transform 0.1s ease;
+  overflow: visible;
+  min-height: 200px;
+  min-width: 200px;
+}
+#mermaid-container > #mermaid-space > .mermaid-content pre {
+  margin: 0;
+  border: none;
+}
+#mermaid-container > #mermaid-space > .mermaid-content svg {
+  max-width: none;
+  height: auto;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--lightgray);
+  background: var(--light);
+  color: var(--dark);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: var(--bodyFont);
+  transition: all 0.2s ease;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:hover {
+  background: var(--lightgray);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:active {
+  transform: translateY(1px);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:nth-child(2) {
+  width: auto;
+  padding: 0 12px;
+  font-size: 14px;
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VSb290IjoiL2hvbWUvcnVubmVyL3dvcmsvQmxvZy9CbG9nL3F1YXJ0ei9jb21wb25lbnRzL3N0eWxlcyIsInNvdXJjZXMiOlsibWVybWFpZC5pbmxpbmUuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7RUFDQTs7QUFHRjtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTs7O0FBS0Y7RUFDRTtFQUNBOzs7QUFJSjtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7O0FBRUE7RUFDRTs7QUFHRjtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7RUFDQTs7QUFHRjtFQUNFO0VBQ0E7O0FBSUo7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFOztBQUdGO0VBQ0U7O0FBSUY7RUFDRTtFQUNBO0VBQ0EiLCJzb3VyY2VzQ29udGVudCI6WyIuZXhwYW5kLWJ1dHRvbiB7XG4gIHBvc2l0aW9uOiBhYnNvbHV0ZTtcbiAgZGlzcGxheTogZmxleDtcbiAgZmxvYXQ6IHJpZ2h0O1xuICBwYWRkaW5nOiAwLjRyZW07XG4gIG1hcmdpbjogMC4zcmVtO1xuICByaWdodDogMDsgLy8gTk9URTogcmlnaHQgd2lsbCBiZSBzZXQgaW4gbWVybWFpZC5pbmxpbmUudHNcbiAgY29sb3I6IHZhcigtLWdyYXkpO1xuICBib3JkZXItY29sb3I6IHZhcigtLWRhcmspO1xuICBiYWNrZ3JvdW5kLWNvbG9yOiB2YXIoLS1saWdodCk7XG4gIGJvcmRlcjogMXB4IHNvbGlkO1xuICBib3JkZXItcmFkaXVzOiA1cHg7XG4gIG9wYWNpdHk6IDA7XG4gIHRyYW5zaXRpb246IDAuMnM7XG5cbiAgJiA+IHN2ZyB7XG4gICAgZmlsbDogdmFyKC0tbGlnaHQpO1xuICAgIGZpbHRlcjogY29udHJhc3QoMC4zKTtcbiAgfVxuXG4gICY6aG92ZXIge1xuICAgIGN1cnNvcjogcG9pbnRlcjtcbiAgICBib3JkZXItY29sb3I6IHZhcigtLXNlY29uZGFyeSk7XG4gIH1cblxuICAmOmZvY3VzIHtcbiAgICBvdXRsaW5lOiAwO1xuICB9XG59XG5cbnByZSB7XG4gICY6aG92ZXIgPiAuZXhwYW5kLWJ1dHRvbiB7XG4gICAgb3BhY2l0eTogMTtcbiAgICB0cmFuc2l0aW9uOiAwLjJzO1xuICB9XG59XG5cbiNtZXJtYWlkLWNvbnRhaW5lciB7XG4gIHBvc2l0aW9uOiBmaXhlZDtcbiAgY29udGFpbjogbGF5b3V0O1xuICB6LWluZGV4OiA5OTk7XG4gIGxlZnQ6IDA7XG4gIHRvcDogMDtcbiAgd2lkdGg6IDEwMHZ3O1xuICBoZWlnaHQ6IDEwMHZoO1xuICBvdmVyZmxvdzogaGlkZGVuO1xuICBkaXNwbGF5OiBub25lO1xuICBiYWNrZHJvcC1maWx0ZXI6IGJsdXIoNHB4KTtcbiAgYmFja2dyb3VuZDogcmdiYSgwLCAwLCAwLCAwLjUpO1xuXG4gICYuYWN0aXZlIHtcbiAgICBkaXNwbGF5OiBpbmxpbmUtYmxvY2s7XG4gIH1cblxuICAmID4gI21lcm1haWQtc3BhY2Uge1xuICAgIGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWxpZ2h0Z3JheSk7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tbGlnaHQpO1xuICAgIGJvcmRlci1yYWRpdXM6IDVweDtcbiAgICBwb3NpdGlvbjogZml4ZWQ7XG4gICAgdG9wOiA1MCU7XG4gICAgbGVmdDogNTAlO1xuICAgIHRyYW5zZm9ybTogdHJhbnNsYXRlKC01MCUsIC01MCUpO1xuICAgIGhlaWdodDogODB2aDtcbiAgICB3aWR0aDogODB2dztcbiAgICBvdmVyZmxvdzogaGlkZGVuO1xuXG4gICAgJiA+IC5tZXJtYWlkLWNvbnRlbnQge1xuICAgICAgcG9zaXRpb246IHJlbGF0aXZlO1xuICAgICAgdHJhbnNmb3JtLW9yaWdpbjogMCAwO1xuICAgICAgdHJhbnNpdGlvbjogdHJhbnNmb3JtIDAuMXMgZWFzZTtcbiAgICAgIG92ZXJmbG93OiB2aXNpYmxlO1xuICAgICAgbWluLWhlaWdodDogMjAwcHg7XG4gICAgICBtaW4td2lkdGg6IDIwMHB4O1xuXG4gICAgICBwcmUge1xuICAgICAgICBtYXJnaW46IDA7XG4gICAgICAgIGJvcmRlcjogbm9uZTtcbiAgICAgIH1cblxuICAgICAgc3ZnIHtcbiAgICAgICAgbWF4LXdpZHRoOiBub25lO1xuICAgICAgICBoZWlnaHQ6IGF1dG87XG4gICAgICB9XG4gICAgfVxuXG4gICAgJiA+IC5tZXJtYWlkLWNvbnRyb2xzIHtcbiAgICAgIHBvc2l0aW9uOiBhYnNvbHV0ZTtcbiAgICAgIGJvdHRvbTogMjBweDtcbiAgICAgIHJpZ2h0OiAyMHB4O1xuICAgICAgZGlzcGxheTogZmxleDtcbiAgICAgIGdhcDogOHB4O1xuICAgICAgcGFkZGluZzogOHB4O1xuICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHQpO1xuICAgICAgYm9yZGVyOiAxcHggc29saWQgdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgIGJvcmRlci1yYWRpdXM6IDZweDtcbiAgICAgIGJveC1zaGFkb3c6IDAgMnB4IDRweCByZ2JhKDAsIDAsIDAsIDAuMSk7XG4gICAgICB6LWluZGV4OiAyO1xuXG4gICAgICAubWVybWFpZC1jb250cm9sLWJ1dHRvbiB7XG4gICAgICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgICAgIGFsaWduLWl0ZW1zOiBjZW50ZXI7XG4gICAgICAgIGp1c3RpZnktY29udGVudDogY2VudGVyO1xuICAgICAgICB3aWR0aDogMzJweDtcbiAgICAgICAgaGVpZ2h0OiAzMnB4O1xuICAgICAgICBwYWRkaW5nOiAwO1xuICAgICAgICBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1saWdodGdyYXkpO1xuICAgICAgICBiYWNrZ3JvdW5kOiB2YXIoLS1saWdodCk7XG4gICAgICAgIGNvbG9yOiB2YXIoLS1kYXJrKTtcbiAgICAgICAgYm9yZGVyLXJhZGl1czogNHB4O1xuICAgICAgICBjdXJzb3I6IHBvaW50ZXI7XG4gICAgICAgIGZvbnQtc2l6ZTogMTZweDtcbiAgICAgICAgZm9udC1mYW1pbHk6IHZhcigtLWJvZHlGb250KTtcbiAgICAgICAgdHJhbnNpdGlvbjogYWxsIDAuMnMgZWFzZTtcblxuICAgICAgICAmOmhvdmVyIHtcbiAgICAgICAgICBiYWNrZ3JvdW5kOiB2YXIoLS1saWdodGdyYXkpO1xuICAgICAgICB9XG5cbiAgICAgICAgJjphY3RpdmUge1xuICAgICAgICAgIHRyYW5zZm9ybTogdHJhbnNsYXRlWSgxcHgpO1xuICAgICAgICB9XG5cbiAgICAgICAgLy8gU3R5bGUgdGhlIHJlc2V0IGJ1dHRvbiBkaWZmZXJlbnRseVxuICAgICAgICAmOm50aC1jaGlsZCgyKSB7XG4gICAgICAgICAgd2lkdGg6IGF1dG87XG4gICAgICAgICAgcGFkZGluZzogMCAxMnB4O1xuICAgICAgICAgIGZvbnQtc2l6ZTogMTRweDtcbiAgICAgICAgfVxuICAgICAgfVxuICAgIH1cbiAgfVxufVxuIl19 */</style><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="./prescript.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("./static/contentIndex.json").then(data => data.json())</script><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="https://quartz.jzhao.xyz/index.xml"/><meta property="og:image:width" content="1200"/><meta property="og:image:height" content="630"/><meta property="og:image" content="https://quartz.jzhao.xyz/Analise_de_vulnerabildade_DevSecOps_trivy-og-image.webp"/><meta property="og:image:url" content="https://quartz.jzhao.xyz/Analise_de_vulnerabildade_DevSecOps_trivy-og-image.webp"/><meta name="twitter:image" content="https://quartz.jzhao.xyz/Analise_de_vulnerabildade_DevSecOps_trivy-og-image.webp"/><meta property="og:image:type" content="image/.webp"/></head><body data-slug="Analise_de_vulnerabildade_DevSecOps_trivy"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h2 class="page-title"><a href=".">Quartz 4</a></h2><div class="spacer mobile-only"></div><div class="flex-component" style="flex-direction: row; flex-wrap: nowrap; gap: 1rem;"><div style="flex-grow: 1; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><div class="search"><button class="search-button"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>Search</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div class="search-layout" data-preview="true"></div></div></div></div></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="darkmode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="Dark mode"><title>Dark mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="Light mode"><title>Light mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="readermode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="readerIcon" fill="currentColor" stroke="currentColor" stroke-width="0.2" stroke-linecap="round" stroke-linejoin="round" width="64px" height="64px" viewBox="0 0 24 24" aria-label="Reader mode"><title>Reader mode</title><g transform="translate(-1.8, -1.8) scale(1.15, 1.2)"><path d="M8.9891247,2.5 C10.1384702,2.5 11.2209868,2.96705384 12.0049645,3.76669482 C12.7883914,2.96705384 13.8709081,2.5 15.0202536,2.5 L18.7549359,2.5 C19.1691495,2.5 19.5049359,2.83578644 19.5049359,3.25 L19.5046891,4.004 L21.2546891,4.00457396 C21.6343849,4.00457396 21.9481801,4.28672784 21.9978425,4.6528034 L22.0046891,4.75457396 L22.0046891,20.25 C22.0046891,20.6296958 21.7225353,20.943491 21.3564597,20.9931534 L21.2546891,21 L2.75468914,21 C2.37499337,21 2.06119817,20.7178461 2.01153575,20.3517706 L2.00468914,20.25 L2.00468914,4.75457396 C2.00468914,4.37487819 2.28684302,4.061083 2.65291858,4.01142057 L2.75468914,4.00457396 L4.50368914,4.004 L4.50444233,3.25 C4.50444233,2.87030423 4.78659621,2.55650904 5.15267177,2.50684662 L5.25444233,2.5 L8.9891247,2.5 Z M4.50368914,5.504 L3.50468914,5.504 L3.50468914,19.5 L10.9478955,19.4998273 C10.4513189,18.9207296 9.73864328,18.5588115 8.96709342,18.5065584 L8.77307039,18.5 L5.25444233,18.5 C4.87474657,18.5 4.56095137,18.2178461 4.51128895,17.8517706 L4.50444233,17.75 L4.50368914,5.504 Z M19.5049359,17.75 C19.5049359,18.1642136 19.1691495,18.5 18.7549359,18.5 L15.2363079,18.5 C14.3910149,18.5 13.5994408,18.8724714 13.0614828,19.4998273 L20.5046891,19.5 L20.5046891,5.504 L19.5046891,5.504 L19.5049359,17.75 Z M18.0059359,3.999 L15.0202536,4 L14.8259077,4.00692283 C13.9889509,4.06666544 13.2254227,4.50975805 12.7549359,5.212 L12.7549359,17.777 L12.7782651,17.7601316 C13.4923805,17.2719483 14.3447024,17 15.2363079,17 L18.0059359,16.999 L18.0056891,4.798 L18.0033792,4.75457396 L18.0056891,4.71 L18.0059359,3.999 Z M8.9891247,4 L6.00368914,3.999 L6.00599909,4.75457396 L6.00599909,4.75457396 L6.00368914,4.783 L6.00368914,16.999 L8.77307039,17 C9.57551536,17 10.3461406,17.2202781 11.0128313,17.6202194 L11.2536891,17.776 L11.2536891,5.211 C10.8200889,4.56369974 10.1361548,4.13636104 9.37521067,4.02745763 L9.18347055,4.00692283 L8.9891247,4 Z"></path></g></svg></button></div></div><div class="explorer" data-behavior="link" data-collapsed="collapsed" data-savestate="true" data-data-fns="{&quot;order&quot;:[&quot;filter&quot;,&quot;map&quot;,&quot;sort&quot;],&quot;sortFn&quot;:&quot;(a,b)=>!a.isFolder&amp;&amp;!b.isFolder||a.isFolder&amp;&amp;b.isFolder?a.displayName.localeCompare(b.displayName,void 0,{numeric:!0,sensitivity:\&quot;base\&quot;}):!a.isFolder&amp;&amp;b.isFolder?1:-1&quot;,&quot;filterFn&quot;:&quot;node=>node.slugSegment!==\&quot;tags\&quot;&quot;,&quot;mapFn&quot;:&quot;node=>node&quot;}"><button type="button" class="explorer-toggle mobile-explorer hide-until-loaded" data-mobile="true" aria-controls="explorer-22"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-menu"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button><button type="button" class="title-button explorer-toggle desktop-explorer" data-mobile="false" aria-expanded="true"><h2>Explorer</h2><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="explorer-22" class="explorer-content" aria-expanded="false" role="group"><ul class="explorer-ul overflow" id="list-0"><li class="overflow-end"></li></ul></div><template id="template-file"><li><a href="#"></a></li></template><template id="template-folder"><li><div class="folder-container"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="folder-icon"><polyline points="6 9 12 15 18 9"></polyline></svg><div><button class="folder-button"><span class="folder-title"></span></button></div></div><div class="folder-outer"><ul class="content"></ul></div></li></template></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="./">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>Analise de vulnerabildade com Trivy</a></div></nav><h1 class="article-title">Analise de vulnerabildade com Trivy</h1><p show-comma="true" class="content-meta"><time datetime="2026-05-24T15:59:59.252Z">May 24, 2026</time><span>16 min read</span></p><ul class="tags"><li><a href="./tags/Trivy" class="internal tag-link">Trivy</a></li><li><a href="./tags/Kubernets" class="internal tag-link">Kubernets</a></li><li><a href="./tags/Docker" class="internal tag-link">Docker</a></li><li><a href="./tags/AzureDevOps" class="internal tag-link">AzureDevOps</a></li></ul></div></div><article class="popover-hint"><p>O scanner de imagens é um componente crucial do DevSecOps (Desenvolvimento, Segurança e Operações) porque ajuda a identificar e mitigar vulnerabilidades de segurança em aplicativos em contêiner e suas dependências. O DevSecOps visa integrar práticas de segurança em todo o ciclo de vida de desenvolvimento de software, incluindo os estágios iniciais de desenvolvimento, para garantir que a segurança não seja uma reflexão tardia. O scanner de imagens aborda especificamente preocupações de segurança relacionadas a ambientes em contêineres, como contêineres do Docker e orquestração do Kubernetes.</p>
+<p>Aqui estão algumas das principais razões que destacam a importância da analise de imagens no DevSecOps:</p>
+<blockquote>
+<p>Detecção Precoce de Vulnerabilidades</p>
+</blockquote>
+<p>O scanner de imagens permite a detecção precoce de vulnerabilidades em imagens de contêiner. Ao digitalizar imagens como parte do processo de desenvolvimento, os problemas de segurança podem ser identificados e abordados antes de entrarem em produção, reduzindo o risco de violações de segurança.</p>
+<blockquote>
+<p>shift left</p>
+</blockquote>
+<p>O scanner de imagens promove a abordagem “shift left” à segurança, o que significa que a segurança está integrada no processo de desenvolvimento desde o início. Os desenvolvedores podem identificar e corrigir vulnerabilidades em seus códigos e dependências no início do ciclo de vida do desenvolvimento, minimizando a necessidade de correções de segurança de última hora antes da implantação.</p>
+<blockquote>
+<p>Segurança do container</p>
+</blockquote>
+<p>Os contêineres se tornaram uma tecnologia popular para empacotar e implantar aplicativos. No entanto, eles introduzem novos desafios de segurança. O scanner de imagens ajuda a garantir que as imagens do contêiner estejam livres de vulnerabilidades conhecidas, configurações incorretas ou outros problemas de segurança que possam ser explorados por invasores.</p>
+<blockquote>
+<p>Monitoramento Contínuo</p>
+</blockquote>
+<p>O DevSecOps enfatiza o monitoramento contínuo de aplicativos e infraestrutura. O scanner de imagens não é uma atividade única, mas sim um processo contínuo que é integrado ao pipeline CI/CD (Continuous Integration/Continuous Deployment). Esse monitoramento contínuo ajuda a detectar e resolver novas vulnerabilidades que podem surgir ao longo do tempo.</p>
+<hr/>
+<h1 id="trivy">Trivy<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#trivy" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<p>O Trivy é um scanner de vulnerabilidades de código aberto projetado para detetar problemas de segurança em imagens de contêineres, sistemas de arquivos e configurações de infraestrutura como código, como manifestos do Kubernetes ou arquivos do Terraform. É particularmente conhecido pela sua simplicidade, velocidade e capacidades abrangentes de deteção de vulnerabilidades, tornando-o uma escolha popular para equipas de DevOps e pipelines de CI/CD.</p>
+<h2 id="overview">Overview<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#overview" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="principais-benefícios-do-trivy-para-imagens-docker-e-arquivos-dockerfile">Principais benefícios do Trivy para imagens Docker e arquivos Dockerfile<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#principais-benefícios-do-trivy-para-imagens-docker-e-arquivos-dockerfile" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>Deteção abrangente de vulnerabilidades:</strong></p>
+<ul>
+<li>Examina as imagens do Docker em busca de vulnerabilidades conhecidas nos pacotes de software e SO instalados.</li>
+<li>Inspeciona Dockerfiles em busca de configurações incorretas que possam levar a riscos de segurança.</li>
+<li>Suporta a verificação de modelos de Infraestrutura como Código (IaC), aumentando a segurança das configurações de orquestração de contêineres.</li>
+</ul>
+<p><strong>Facilidade de uso:</strong></p>
+<ul>
+<li>Requer configuração mínima - o Trivy pode analisar com um único comando.</li>
+<li>Actualiza automaticamente a sua base de dados de vulnerabilidades a partir de fontes públicas, como a NVD (National Vulnerability Database) e avisos de fornecedores.</li>
+</ul>
+<p><strong>Velocidade e eficiência:</strong></p>
+<ul>
+<li>Varreduras rápidas com baixo uso de recursos, adequadas para uso em pipelines de CI/CD sem atrasos significativos.</li>
+</ul>
+<p><strong>Ampla compatibilidade:</strong></p>
+<ul>
+<li>Suporta vários sistemas operacionais e gerenciadores de pacotes populares, garantindo ampla cobertura.</li>
+<li>Compatível com as principais ferramentas de CI/CD, como Jenkins, GitLab CI/CD e GitHub Actions.</li>
+</ul>
+<p><strong>Relatórios detalhados:</strong></p>
+<ul>
+<li>Gera relatórios claros e acionáveis, destacando a gravidade e as correções das vulnerabilidades.</li>
+<li>Integra-se facilmente com ferramentas de monitorização e dashboards.</li>
+</ul>
+<h3 id="boas-práticas-de-utilização-do-trivy">Boas práticas de utilização do Trivy<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#boas-práticas-de-utilização-do-trivy" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>Automatizar a verificação em pipelines de CI/CD:</strong></p>
+<ul>
+<li>Integre o Trivy para executar varreduras em vários estágios do pipeline, como após a criação da imagem do Docker ou durante a implantação.</li>
+</ul>
+<p><strong>Use a segurança <a href="https://itsmnapratica.com.br/shift-left/" class="external">Shift-Left<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>:</strong></p>
+<ul>
+<li>Habilite a verificação de modelos de Dockerfile e IaC no início do desenvolvimento para detetar configurações incorretas antes que elas cheguem à produção.</li>
+</ul>
+<p><strong>Definir limites de gravidade:</strong></p>
+<ul>
+<li>Configure pipelines para falhar em verificações para vulnerabilidades acima de uma determinada gravidade (por exemplo, ALTA ou CRÍTICA).</li>
+<li>Use políticas para personalizar o que é considerado aceitável para sua organização.</li>
+</ul>
+<p><strong>Mantenha o Trivy e os bancos de dados atualizados:</strong></p>
+<ul>
+<li>Atualize regularmente o Trivy para se beneficiar dos recursos e definições de vulnerabilidade mais recentes. Automatize as atualizações do banco de dados sempre que possível.</li>
+</ul>
+<p><strong>Habilite a filtragem:</strong></p>
+<ul>
+<li>Use filtros para excluir vulnerabilidades conhecidas e aceitáveis ou falsos positivos para reduzir o ruído nos resultados.</li>
+</ul>
+<p><strong>Combine com outras ferramentas:</strong></p>
+<ul>
+<li>Embora o Trivy seja abrangente, complemente seus resultados com outras ferramentas (por exemplo, testes dinâmicos de segurança de aplicativos ou ferramentas de proteção em tempo de execução) para uma abordagem de defesa em profundidade.</li>
+</ul>
+<h3 id="instalando-o-trivy">Instalando o Trivy<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#instalando-o-trivy" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>O Trivy está disponível nos canais de distribuição mais comuns. A lista completa de opções de instalação está disponível na página Instalação. Aqui estão alguns exemplos populares:</p>
+<ul>
+<li><code>brew install trivy</code></li>
+<li><code>docker run aquasec/trivy</code></li>
+<li>Binário <a href="https://github.com/aquasecurity/trivy/releases/latest/" class="external">https://github.com/aquasecurity/trivy/releases/latest/<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+<li><a href="https://trivy.dev/v0.57/getting-started/installation/" class="external">Outros<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></li>
+</ul>
+<h3 id="como-executar-o-trivy">Como executar o trivy<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#como-executar-o-trivy" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Estrutura do comando:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">trivy</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> &lt;</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">targe</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">t</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">></span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> [--scanners </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">&lt;</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">scanner1,scanner</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">2></span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">]</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> &lt;</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">subjec</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">t</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">></span></span></code></pre></figure>
+<p>Exemplos:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Scan Dockerfile for vulnerabilities</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">trivy</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> config</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --severity</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> HIGH,CRITICAL</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --exit-code</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 1</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> </span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Scan Filesystem for vulnerabilities</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">trivy</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> fs</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --scanners</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> vuln,secret,misconfig</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> myproject/</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Scan K8s for vulnerabilities</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">trivy</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> k8s</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --report</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> summary</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> cluster</span></span></code></pre></figure>
+<hr/>
+<h2 id="trivy-na-pipeline">Trivy na Pipeline<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#trivy-na-pipeline" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="overview-1">Overview<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#overview-1" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>A integração do Trivy nos pipelines do Azure DevOps ajuda a automatizar a verificação de vulnerabilidades durante o processo de CI/CD, garantindo imagens de containers, configurações e dependências seguras. Ao detectar problemas no início do ciclo de vida do desenvolvimento, está a melhorar a postura de segurança das suas aplicações.</p>
+<p><strong>Por que usar o Trivy no Azure DevOps Pipelines?</strong></p>
+<ul>
+<li>Segurança Shift-Left: Detecte vulnerabilidades e configurações incorretas no início do pipeline de CI/CD.</li>
+<li>Varredura abrangente:
+<ul>
+<li>Examinar imagens de containers para detectar vulnerabilidades (por exemplo, em imagens Docker).</li>
+<li>Auditar arquivos de infraestrutura como código (IaC) em busca de configurações incorretas (por exemplo, Terraform, manifestos do Kubernetes).</li>
+<li>Examinar as dependências do código-fonte em busca de problemas de segurança.</li>
+</ul>
+</li>
+<li>Integração perfeita: Funciona com pipelines de DevOps do Azure sem configurações complexas.</li>
+<li>Conformidade: Garante a adesão a padrões de segurança como CIS Benchmarks.</li>
+</ul>
+<h3 id="implementar-o-trivy-no-pipeline-do-azure-devops">implementar o Trivy no pipeline do Azure DevOps<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#implementar-o-trivy-no-pipeline-do-azure-devops" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Para garantir que o Trivy esteja disponível em todo o pipeline, ele deve ser instalado em um diretório persistente e adicionado ao PATH usando os comandos de log do Azure DevOps.</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="yml" data-theme="github-light github-dark"><code data-language="yml" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">- </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">task</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">CmdLine@2</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  displayName</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;Installing Trivy&quot;</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  inputs</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    script</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">|</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      # Define the directory for installation</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      export TRIVY_DIR=$(Agent.ToolsDirectory)/trivy # /home/AzDevOps/azure-devops-agent/_work/_tool/trivy</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      mkdir -p $TRIVY_DIR</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      </span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      # Install Trivy in the designated directory</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b $TRIVY_DIR</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      # Set ownership for the Azure DevOps agent user</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      sudo chown $(whoami):$(whoami) $TRIVY_DIR -R</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      # Add Trivy to the PATH using Azure DevOps logging command</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      echo &quot;##vso[task.prependpath]$TRIVY_DIR&quot;</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      </span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      # Verify Trivy installation</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      trivy --version</span></span>
+<span data-line> </span></code></pre></figure>
+<p>Esta task:</p>
+<ul>
+<li>Instala o Trivy no diretório <code>$(Agent.ToolsDirectory)/trivy</code>.</li>
+<li>Atualiza o PATH globalmente para o pipeline usando o comando <code>##vso[task.prependpath]</code>.</li>
+<li>Garante que a instalação seja acessível pelo agente do pipeline.</li>
+</ul>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="shell" data-theme="github-light github-dark"><code data-language="shell" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Trivy</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> is</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> not</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> installed.</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> Installing</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> now...</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">/home/AzDevOps/azure-devops-agent/_work/_tool/trivy</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">aquasecurity/trivy</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> info</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> checking</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> GitHub</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> for</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> latest</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> tag</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">aquasecurity/trivy</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> info</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> found</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> version:</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 0.57.1</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> for</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> v0.57.1/Linux/64bit</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">aquasecurity/trivy</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> info</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> installed</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /home/AzDevOps/azure-devops-agent/_work/_tool/trivy/trivy</span></span></code></pre></figure>
+<h4 id="verificar-se-há-erros-de-configuração-no-dockerfile">Verificar se há erros de configuração no Dockerfile<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#verificar-se-há-erros-de-configuração-no-dockerfile" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h4>
+<p>O Trivy pode verificar os Dockerfiles em busca de configurações incorretas com base nas práticas recomendadas de segurança.</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="yml" data-theme="github-light github-dark"><code data-language="yml" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">- </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">task</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">CmdLine@2</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  displayName</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;Running Trivy Dockerfile scan...&quot;</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  inputs</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    script</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">|</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      # Scan Dockerfile for vulnerabilities</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      trivy config --severity HIGH,CRITICAL --exit-code 1 $(WORKDIR)/Dockerfile</span></span>
+<span data-line> </span></code></pre></figure>
+<p>Esta task:</p>
+<ul>
+<li>Examina o Dockerfile localizado em $(WORKDIR)/Dockerfile.</li>
+<li>Falha o pipeline se forem detectadas vulnerabilidades de gravidade HIGH ou CRITICAL.</li>
+</ul>
+<h4 id="verificar-se-há-vulnerabilidades-na-imagem-do-docker">Verificar se há vulnerabilidades na imagem do Docker<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#verificar-se-há-vulnerabilidades-na-imagem-do-docker" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h4>
+<p>Assim que a imagem Docker for criada, analise-a em busca de vulnerabilidades.</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="yml" data-theme="github-light github-dark"><code data-language="yml" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">- </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">task</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">CmdLine@2</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  displayName</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;Running Trivy image scan...&quot;</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  inputs</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    script</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">|</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      # Scan Docker image for vulnerabilities</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      trivy image --severity HIGH,CRITICAL --exit-code 1 $(REMOTE_DOCKER_IMAGE):$(REMOTE_DOCKER_IMAGE_TAG)</span></span>
+<span data-line> </span></code></pre></figure>
+<p>Esta task:</p>
+<ul>
+<li>Examina a imagem do Docker marcada com <code>$(REMOTE_DOCKER_IMAGE):$(REMOTE_DOCKER_IMAGE_TAG)</code></li>
+<li>Falha o pipeline se forem detectadas vulnerabilidades de gravidade HIGH ou CRITICAL.</li>
+</ul>
+<h4 id="implementando-aprovação-adicional">Implementando aprovação adicional<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#implementando-aprovação-adicional" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h4>
+<p>A pipeline abaixo efectua verificações de segurança utilizando o Trivy numa fase de desenvolvimento e incorpora um processo de aprovação manual se forem encontradas vulnerabilidades específicas.</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="yml" data-theme="github-light github-dark"><code data-language="yml" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">stages</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  - </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">stage</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">Development</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    jobs</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      - </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">job</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">trivy</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">        displayName</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;Releasing on Development&quot;</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">        timeoutInMinutes</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">0</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">        steps</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">          - </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">checkout</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">self</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">          - </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">template</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">/.azuredevops/templates/git/checkout.yml</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">            parameters</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">              HASH_CODE</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">$(HASH_CODE)</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">              WORKDIR_RELEASE</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">$(WORKDIR_RELEASE)</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">              PRODUCTION</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">$(PRODUCTION)</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">          - </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">task</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">CmdLine@2</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">            displayName</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;Check and Install Trivy&quot;</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">            inputs</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">              script</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">|</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                if ! command -v trivy &amp;> /dev/null; then</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                  echo &quot;Trivy is not installed. Installing now...&quot;</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                  export TRIVY_DIR=$(Agent.ToolsDirectory)/trivy</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                  echo $TRIVY_DIR</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                  mkdir -p $TRIVY_DIR</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                  curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b $TRIVY_DIR</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                  sudo chown $(whoami):$(whoami) $TRIVY_DIR -R</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                  echo &quot;##vso[task.prependpath]$TRIVY_DIR&quot;</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                else</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                  echo &quot;Trivy is already installed. Skipping installation.&quot;</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                  trivy --version</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                fi</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">          - </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">task</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">CmdLine@2</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">            displayName</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;Running Trivy Dockerfile scan...&quot;</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">            name</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">trivyScan</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">            inputs</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">              script</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">|</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                echo &quot;Trivy is already installed. Skipping installation.&quot;</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                </span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                trivy config --severity CRITICAL --exit-code 1 $(WORKDIR)/Dockerfile</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">		if [ $? -eq 1 ]; then</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                   echo &quot;CRITICAL vulnerabilities found in Dockerfile! Failing the pipeline.&quot;</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                   exit 1</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                fi</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">                </span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                trivy config --severity HIGH,CRITICAL --exit-code 2 $(WORKDIR)/Dockerfile</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                if [ $? -eq 2 ]; then</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                  echo &quot;HIGH vulnerabilities found! Marking for manual approval.&quot;</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                  echo &quot;##vso[task.setvariable variable=trivyIssuesFound;isOutput=true]true&quot;</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                fi</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      - </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">deployment</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">PauseForApproval</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">        displayName</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;Manual Approval for HIGH Vulnerabilities&quot;</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">        environment</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;approvalrequired&quot;</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">        dependsOn</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">trivy</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">        condition</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">eq(dependencies.trivy.outputs['trivyScan.trivyIssuesFound'],'true')</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">        pool</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">server</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">        strategy</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">          runOnce</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">            deploy</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">              steps</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">                - </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">task</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">ManualValidation@0</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">                  displayName</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;Manual Approval for HIGH Vulnerabilities&quot;</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">                  inputs</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">                    notifyUsers</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">'name.lastname'</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">                    instructions</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">'Vulnerabilities detected. Review and approve to continue.'</span></span>
+<span data-line> </span></code></pre></figure>
+<p>O Trivy examina Dockerfile em busca de vulnerabilidades com gravidade HIGH ou CRITICAL, e define uma variável de pipeline (trivyIssuesFound) para acionar um processo de revisão manual se forem encontradas vulnerabilidades HIGH.</p>
+<p>Em seguida, a pipeline exige uma validação manual com base no valor da variavel
+<code>trivyIssuesFound</code>, o que Instrui os utilizadores a avaliarem as vulnerabilidades antes de avançarem mais no pipeline.</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="yaml" data-theme="github-light github-dark"><code data-language="yaml" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">- </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">deployment</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">PauseForApproval</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">        displayName</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;Manual Approval for HIGH Vulnerabilities&quot;</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">        environment</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;approvalrequired&quot;</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">        dependsOn</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">trivy</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">        condition</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">eq(dependencies.trivy.outputs['trivyScan.trivyIssuesFound'],'true')</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">        pool</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">server</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">        strategy</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">          runOnce</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">            deploy</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">              steps</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">                - </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">task</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">ManualValidation@0</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">                  displayName</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">&quot;Manual Approval for HIGH Vulnerabilities&quot;</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">                  inputs</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">                    notifyUsers</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">'name.lastname'</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">                    instructions</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">'Vulnerabilities detected. Review and approve to continue.'</span></span></code></pre></figure>
+<h3 id="recomendações-para-a-integração-do-pipeline-cicd">Recomendações para a integração do pipeline CI/CD<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#recomendações-para-a-integração-do-pipeline-cicd" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>Configurar como uma etapa do pipeline:</strong></p>
+<ul>
+<li>Incluir varreduras Trivy como uma etapa obrigatória na configuração do seu pipeline.</li>
+</ul>
+<p><strong>Varreduras de imagem do contêiner:</strong></p>
+<ul>
+<li>Verificar a imagem final do Docker antes de enviar para o registo para identificar vulnerabilidades no software incluído.</li>
+</ul>
+<p><strong>Varreduras pré-compilação:</strong></p>
+<ul>
+<li>Examinar Dockerfiles ou outras configurações de IaC para detetar possíveis problemas de segurança durante a fase de desenvolvimento.</li>
+</ul>
+<p><strong>Gerar relatórios para conformidade:</strong></p>
+<ul>
+<li>Exporte relatórios Trivy em formatos como JSON ou SARIF para integração com ferramentas de conformidade ou auditorias.</li>
+</ul>
+<p><strong>Otimizar o desempenho da varredura:</strong></p>
+<ul>
+<li>Armazene em cache as atualizações do banco de dados do Trivy para evitar baixá-las repetidamente, especialmente em ambientes com vários pipelines.</li>
+</ul>
+<h3 id="exportando-relatorio-para-o-elastic">Exportando relatorio para o Elastic<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#exportando-relatorio-para-o-elastic" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Use o Logstash para consumir os relatórios. Segue exemplo de uma pipelina do logstash:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="json" data-theme="github-light github-dark"><code data-language="json" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">logstash.conf: |</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">input {</span></span>
+<span data-line><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;">	file</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> {</span></span>
+<span data-line><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;">		path</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> =></span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> &quot;/data/trivy.json&quot;</span></span>
+<span data-line><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;">		start_position</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> =></span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> &quot;beginning&quot;</span></span>
+<span data-line><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;">		codec</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> =></span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> &quot;json&quot;</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">	}</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">}</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">filter{</span></span>
+<span data-line><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;">	if</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> [Results]</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> {</span></span>
+<span data-line><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;">		mutate</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> {</span></span>
+<span data-line><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;">			add_field</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> =></span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> {</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> &quot;[@metadata][filtered_results]&quot;</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> =></span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> &quot;%{[Results]}&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">		}</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">		split { </span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;">field</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> =></span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> &quot;[@metadata][filtered_results]&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">		mutate {</span></span>
+<span data-line><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;">			replace</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> =></span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> {</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> &quot;[Target]&quot;</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> =></span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> &quot;[@metadata][filtered_results][Target]&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">			replace => { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">&quot;[Class]&quot;</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> =></span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> &quot;[@metadata][filtered_results][Class]&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">			replace => { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">&quot;[Type]&quot;</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> =></span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> &quot;[@metadata][filtered_results][Type]&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">			replace => { </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">&quot;[Vulnerabilities]&quot;</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> =></span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> &quot;[@metadata][filtered_results][Vulnerabilities]&quot;</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">		}</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">	} else {</span></span>
+<span data-line><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;">		drop</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> {</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">	}</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">}</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">output {</span></span>
+<span data-line><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;">	elasticsearch</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> {</span></span>
+<span data-line><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;">		hosts</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> =></span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> ''</span></span>
+<span data-line><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;">		user</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> =></span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> ''</span></span>
+<span data-line><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;">		password</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> =></span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> ''</span></span>
+<span data-line><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;">		index</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> =></span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> &quot;trivy-vulnerabilities-%{+YYYY.MM.dd}&quot;</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">	}</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">	stdout { </span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;">codec</span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> =></span><span style="--shiki-light:#B31D28;--shiki-light-font-style:italic;--shiki-dark:#FDAEB7;--shiki-dark-font-style:italic;"> rubydebug</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> }</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">}</span></span></code></pre></figure>
+<h2 id="trivy-kubernets-operator">Trivy Kubernets Operator<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#trivy-kubernets-operator" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="overview-2">Overview<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#overview-2" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>O Trivy Operator utiliza o Trivy para analisar continuamente o cluster do Kubernetes em busca de problemas de segurança. As análises são resumidas em relatórios de segurança como Definições de Recursos Personalizados do Kubernetes, que se tornam acessíveis através da API do Kubernetes. O Operator faz isso observando o Kubernetes em busca de alterações de estado e acionando automaticamente as verificações de segurança em resposta.</p>
+<p>Quando utilizado com o Trivy Kubernetes Operator, permite uma integração perfeita com os fluxos de trabalho do Kubernetes, tornando eficiente a avaliação e a comunicação de vulnerabilidades em todo o cluster. Por exemplo, uma verificação de vulnerabilidade é iniciada quando um novo Pod é criado. Desta forma, os utilizadores podem encontrar e visualizar os riscos relacionados com diferentes recursos de uma forma nativa do Kubernetes.</p>
+<p><img src="./attachments/image-af215749-f826-4448-9d63-08e3b32d49b8.png" alt="image.png"/></p>
+<p><strong>Por que usar Trivy como uma ferramenta de análise de vulnerabilidade com Kubernetes?</strong></p>
+<ul>
+<li>Riscos específicos do Kubernetes:
+<ul>
+<li>Os clusters do Kubernetes são dinâmicos e geralmente envolvem várias imagens, configurações e dependências de contêineres. Configurações incorretas ou imagens desatualizadas podem expô-los a vulnerabilidades.</li>
+</ul>
+</li>
+<li>A Trivy é especializada na verificação de:
+<ul>
+<li>Vulnerabilidades em imagens de contentores.</li>
+<li>Configurações incorretas em manifestos do Kubernetes.</li>
+<li>Conformidade com padrões de segurança, como CIS Benchmarks.</li>
+</ul>
+</li>
+<li>Cobertura abrangente:
+<ul>
+<li>O Trivy fornece uma única ferramenta para verificar:</li>
+<li>Imagens de contêineres.</li>
+<li>Sistemas de arquivos e repositórios Git.</li>
+<li>Manifestos do Kubernetes (gráficos YAML/Helm).</li>
+<li>Ferramentas de infraestrutura como código (IaC), como Terraform.</li>
+</ul>
+</li>
+<li>Ele identifica vulnerabilidades e exposições comuns (CVEs) e oferece recomendações acionáveis.</li>
+</ul>
+<p><strong>Benefícios do uso do Trivy Kubernetes Operator sobre o Trivy CLI Standalone</strong></p>
+<p>Embora o Trivy CLI Standalone seja uma ferramenta poderosa para varredura ad-hoc, o Trivy Kubernetes Operator oferece vantagens adicionais para ambientes Kubernetes:</p>
+<ul>
+<li><strong>Monitoramento em todo o cluster</strong>:
+<ul>
+<li>O operador automatiza a varredura de recursos dentro do cluster Kubernetes, incluindo nós, pods e imagens, sem exigir acionadores manuais.</li>
+</ul>
+</li>
+<li><strong>Varredura contínua</strong>:
+<ul>
+<li>Verifica proativamente as workloads e suas dependências à medida que são criadas ou modificadas.</li>
+<li>Detecta vulnerabilidades e configurações incorretas em tempo real, garantindo uma correção mais rápida.</li>
+</ul>
+</li>
+<li><strong>Relatórios centralizados</strong>:
+<ul>
+<li>As varreduras geram insights detalhados sobre:
+<ul>
+<li>workloads vulneráveis.</li>
+<li>Imagens afetadas e seus namespaces.</li>
+<li>Objetos do Kubernetes mal configurados.</li>
+</ul>
+</li>
+<li>Os resultados são armazenados em CRDs (Custom Resource Definitions) personalizados do Kubernetes, permitindo que os desenvolvedores e as equipes de segurança consultem os dados por meio de ferramentas do Kubernetes.</li>
+</ul>
+</li>
+<li><strong>Nativo do Kubernetes</strong>:
+<ul>
+<li>O operador é executado como um recurso do Kubernetes, o que significa que ele aproveita o ecossistema nativo do Kubernetes para agendamento, implantação e dimensionamento.</li>
+<li>Ajusta automaticamente a frequência de varredura com base na disponibilidade de recursos do cluster.</li>
+</ul>
+</li>
+<li><strong>Intervenção manual reduzida</strong>:
+<ul>
+<li>Ao contrário da CLI, o operador não requer execução periódica ou scripting para automação. Funciona de forma autónoma dentro do cluster.</li>
+</ul>
+</li>
+</ul>
+<h3 id="implementando-o-trivy-operator">Implementando o Trivy Operator<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#implementando-o-trivy-operator" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>1. Pré-requisitos</strong></p>
+<p>Antes de implantar o Trivy Operator, verifique o seguinte:</p>
+<ul>
+<li>Um cluster Kubernetes em execução.</li>
+<li>Helm CLI instalado e configurado.</li>
+<li>Permissões para instalar recursos personalizados (função de administrador de cluster ou equivalente).</li>
+</ul>
+<p><strong>2. Adicionar o Repositório do Helm do Operador Trivy</strong></p>
+<p>Adicione o repositório Helm para o Trivy Operator:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="Shell" data-theme="github-light github-dark"><code data-language="Shell" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>helm repo add aqua https://aquasecurity.github.io/helm-charts/</span></span>
+<span data-line><span>helm repo update</span></span></code></pre></figure>
+<p><strong>3. Instalar o Trivy Operator</strong></p>
+<p>Use o comando helm install para implantar o Trivy Operator:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="Shell" data-theme="github-light github-dark"><code data-language="Shell" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>helm install trivy-operator aqua/trivy-operator \</span></span>
+<span data-line><span>  --namespace trivy-system \</span></span>
+<span data-line><span>  --create-namespace \</span></span>
+<span data-line><span>  --version 0.25.0</span></span></code></pre></figure>
+<p><strong>4. Verificar a instalação</strong></p>
+<p>Verificar se os pods do Trivy Operator estão a funcionar:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="Shell" data-theme="github-light github-dark"><code data-language="Shell" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>kubectl get pods -n trivy-system</span></span>
+<span data-line><span>---</span></span>
+<span data-line><span># output</span></span>
+<span data-line><span>NAME                                READY   STATUS    RESTARTS   AGE</span></span>
+<span data-line><span>trivy-operator-&lt;hash>               1/1     Running   0          &lt;age></span></span></code></pre></figure>
+<p><strong>5. Personalizando a instalação do Trivy Operator</strong></p>
+<p>Você pode personalizar a configuração do Trivy Operator fornecendo um arquivo values.yaml ou substituindo os valores padrão com o sinalizador —set durante a instalação.</p>
+<p>Exempo:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="yaml" data-theme="github-light github-dark"><code data-language="yaml" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">trivyOperator</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  config</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    severity</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">CRITICAL,HIGH</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> </span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    ignoreUnfixed</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">true</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> </span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    prometheus</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">      enabled</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">true</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"> # Permite exportar métricas no formato Prometheus.</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">service</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  metricsPort</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">8080</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">trivy</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  ignoreUnfixed</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">true</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">serviceMonitor</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">  # enabled determina se um serviceMonitor deve ser implantado</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  enabled</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">false</span></span></code></pre></figure>
+<p>Instale o Trivy Operator com a configuração personalizada:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="Shell" data-theme="github-light github-dark"><code data-language="Shell" data-theme="github-light github-dark" style="display:grid;"><span data-line><span>helm install trivy-operator aqua/trivy-operator \</span></span>
+<span data-line><span>  --namespace trivy-system \</span></span>
+<span data-line><span>  --create-namespace \</span></span>
+<span data-line><span>  --version 0.25.0 \</span></span>
+<span data-line><span>  -f values.yaml</span></span></code></pre></figure>
+<p>Output</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="shell" data-theme="github-light github-dark"><code data-language="shell" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">NAME:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> trivy-operator</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">LAST</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> DEPLOYED:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> Sun</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> Dec</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  1</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> 22:58:02</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 2024</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">NAMESPACE:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> trivy-system</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">STATUS:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> deployed</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">REVISION:</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 1</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">TEST</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> SUITE:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> None</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">NOTES:</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">You</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> have</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> installed</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> Trivy</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> Operator</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> in</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> the</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> trivy-system</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> namespace.</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">It</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> is</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> configured</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> to</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> discover</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> Kubernetes</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> workloads</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> and</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> resources</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> in</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">all</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> namespace</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">(</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">s</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">.</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Inspect</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> created</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> VulnerabilityReports</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> by:</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">    kubectl</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> get</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> vulnerabilityreports</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --all-namespaces</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -o</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> wide</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Inspect</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> created</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ConfigAuditReports</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> by:</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">    kubectl</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> get</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> configauditreports</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --all-namespaces</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -o</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> wide</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Inspect</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> the</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> work</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> log</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> of</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> trivy-operator</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> by:</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">    kubectl</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> logs</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -n</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> trivy-system</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> deployment/trivy-operator</span></span></code></pre></figure>
+<p>Como podemos ver, o trivy agora se tornou comandos nativos do Kubernets. Como teste, vamos executar uma varredura numa workload</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="shell" data-theme="github-light github-dark"><code data-language="shell" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">kubectl</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> get</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> vulnerabilityreports</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -n</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> app-vulnerabilits</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -o</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> wide</span></span></code></pre></figure>
+<p>output:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="shell" data-theme="github-light github-dark"><code data-language="shell" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">NAME</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                                                        REPOSITORY</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                       TAG</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">     SCANNER</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">   AGE</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">   CRITICAL</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">   HIGH</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">   MEDIUM</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">   LOW</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">   UNKNOWN</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">replicaset-react-application-7f797b95f4-react-application</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">   anaisurlichs/react-example-app</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">   8.0.0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">   Trivy</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">     20h</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">   8</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">          58</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">     37</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">       2</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">     0</span></span></code></pre></figure>
+<p>Se for necessário remover o Trivy Operator:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="shell" data-theme="github-light github-dark"><code data-language="shell" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">helm</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> uninstall</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> trivy-operator</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --namespace</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> trivy-system</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">kubectl</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> delete</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> namespace</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> trivy-system</span></span></code></pre></figure>
+<p>Para mains informacoes sobre quais foram os CRD criado, <a href="https://aquasecurity.github.io/trivy-operator/latest/docs/crds/" class="external">acesse a página do Trivy<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a></p>
+<hr/>
+<h2 id="trivy-com-ferramentas-de-observabilidade-como-o-prometheus">Trivy com ferramentas de observabilidade, como o Prometheus<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#trivy-com-ferramentas-de-observabilidade-como-o-prometheus" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>A integração do Trivy com ferramentas de observabilidade aumenta a visibilidade e a conscientização de vulnerabilidades em clusters do Kubernetes.</p>
+<ul>
+<li>Integração do Prometheus:
+<ul>
+<li>Exportar métricas: O Trivy Kubernetes Operator expõe métricas sobre vulnerabilidades e resultados de verificação em um formato compatível com o Prometheus.</li>
+<li>Insights em tempo real: O Prometheus extrai métricas dos endpoints do Trivy, permitindo que as equipes acompanhem as tendências ao longo do tempo, como:
+<ul>
+<li>Número de vulnerabilidades críticas por namespace.</li>
+<li>Contagens de vulnerabilidades por tipo de carga de trabalho (por exemplo, pods, deployments).</li>
+<li>Tempos de conclusão de varredura e taxas de sucesso.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Dashboards do Grafana:
+- Use as métricas do Prometheus para criar dashboards do Grafana para visualizar os riscos de segurança em todo o cluster.
+<ul>
+<li>Os painéis podem mostrar:
+<ul>
+<li>Mapas de calor de vulnerabilidades em cargas de trabalho.</li>
+<li>Tendências na resolução ou mitigação de CVEs.</li>
+<li>Pontuações de conformidade com base nas configurações do Kubernetes.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Resposta a incidentes:
+<ul>
+<li>As regras de alerta do Prometheus podem ser configuradas para limites específicos, como:
+<ul>
+<li>Um alto número de vulnerabilidades críticas detectadas em namespaces de produção.</li>
+<li>Configurações incorretas recorrentes sinalizadas pelo Trivy.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="integração-do-trivy-operator-com-o-prometheus-stack-kube-prometheus-stack-usando-o-helm">Integração do Trivy Operator com o Prometheus Stack (kube-prometheus-stack) usando o Helm<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#integração-do-trivy-operator-com-o-prometheus-stack-kube-prometheus-stack-usando-o-helm" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Para integrar o Trivy Kubernetes Operator com a <a href="https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml" class="external">stack do Prometheus<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a>, precisamos configurar o Trivy para exportar métricas no formato do Prometheus e configurar um ServiceMonitor para permitir que o Prometheus extraia essas métricas.</p>
+<p><strong>1. Instalando o kube-prometheus-stack</strong></p>
+<p>Instale o Chart do prometheus stack</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="shell" data-theme="github-light github-dark"><code data-language="shell" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">helm</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> repo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> add</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> prometheus-community</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> https://prometheus-community.github.io/helm-charts</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">helm</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> repo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> update</span></span></code></pre></figure>
+<p>Vamos primeiro definir alguns modificações no value.yaml</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="yaml" data-theme="github-light github-dark"><code data-language="yaml" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">prometheus</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  prometheusSpec</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    serviceMonitorSelectorNilUsesHelmValues</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">false</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    serviceMonitorSelector</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: {}</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    serviceMonitorNamespaceSelector</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: {}</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">grafana</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  sidecar</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    datasources</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">      defaultDatasourceEnabled</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">true</span></span></code></pre></figure>
+<p>Instaler o prometheus stack</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="shell" data-theme="github-light github-dark"><code data-language="shell" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">helm</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> install</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> prometheus</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> prometheus-community/kube-prometheus-stack</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> </span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">	-n</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> monitoring</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">	--create-namespace</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">	--version</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 48.3.1</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">	-f</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> values.yaml</span></span></code></pre></figure>
+<p>Verifique se todos os recursos foram provisionados</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="shell" data-theme="github-light github-dark"><code data-language="shell" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">kl</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> get</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> pods</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -n</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> monitoring</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">          </span></span></code></pre></figure>
+<p>output:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="shell" data-theme="github-light github-dark"><code data-language="shell" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">alertmanager-prometheus-kube-prometheus-alertmanager-0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">   2/2</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">     Running</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">   0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">          19h</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">prometheus-grafana-6d88995fd5-6jvjk</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                      3/3</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">     Running</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">   0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">          19h</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">prometheus-kube-prometheus-operator-69c5dfdc44-h2w8v</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">     1/1</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">     Running</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">   0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">          19h</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">prometheus-kube-state-metrics-786fbd7c69-bpgb6</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">           1/1</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">     Running</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">   0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">          19h</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">prometheus-prometheus-kube-prometheus-prometheus-0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">       2/2</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">     Running</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">   0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">          19h</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">prometheus-prometheus-node-exporter-wpqhs</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                1/1</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">     Running</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">   0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">          19h</span></span></code></pre></figure>
+<p><strong>2. Habilitar métricas do Prometheus no Trivy Operator</strong></p>
+<p>Seguindo o deplymento do Trivy Operator realizado nesse documento, já temos as metricas disponíveis para consumo. Porém, vamos fazer algumas alterações:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="yaml" data-theme="github-light github-dark"><code data-language="yaml" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">trivyOperator</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  config</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    severity</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">CRITICAL,HIGH</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> </span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    ignoreUnfixed</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">true</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> </span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    prometheus</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">      enabled</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">true</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"> # Permite exportar métricas no formato Prometheus.</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">service</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  metricsPort</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">8080</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  headless</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">true</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">trivy</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  ignoreUnfixed</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">true</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">serviceMonitor</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">  # enabled determina se um serviceMonitor deve ser implantado</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  enabled</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">true</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  namespace</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">prometheus</span></span></code></pre></figure>
+<p>Execute novamente o helm:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="shell" data-theme="github-light github-dark"><code data-language="shell" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">helm</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> install</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> trivy-operator</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> aqua/trivy-operator</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  --namespace</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> trivy-system</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  --create-namespace</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  --version</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 0.25.0</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  -f</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> values.yaml</span></span></code></pre></figure>
+<p>Em andamento…</p></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="graph"><h3>Graph View</h3><div class="graph-outer"><div class="graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:1,&quot;scale&quot;:1.1,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.3,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:false,&quot;enableRadial&quot;:false}"></div><button class="global-graph-icon" aria-label="Global Graph"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55 55" fill="currentColor" xml:space="preserve"><path d="M49,0c-3.309,0-6,2.691-6,6c0,1.035,0.263,2.009,0.726,2.86l-9.829,9.829C32.542,17.634,30.846,17,29,17
+                s-3.542,0.634-4.898,1.688l-7.669-7.669C16.785,10.424,17,9.74,17,9c0-2.206-1.794-4-4-4S9,6.794,9,9s1.794,4,4,4
+                c0.74,0,1.424-0.215,2.019-0.567l7.669,7.669C21.634,21.458,21,23.154,21,25s0.634,3.542,1.688,4.897L10.024,42.562
+                C8.958,41.595,7.549,41,6,41c-3.309,0-6,2.691-6,6s2.691,6,6,6s6-2.691,6-6c0-1.035-0.263-2.009-0.726-2.86l12.829-12.829
+                c1.106,0.86,2.44,1.436,3.898,1.619v10.16c-2.833,0.478-5,2.942-5,5.91c0,3.309,2.691,6,6,6s6-2.691,6-6c0-2.967-2.167-5.431-5-5.91
+                v-10.16c1.458-0.183,2.792-0.759,3.898-1.619l7.669,7.669C41.215,39.576,41,40.26,41,41c0,2.206,1.794,4,4,4s4-1.794,4-4
+                s-1.794-4-4-4c-0.74,0-1.424,0.215-2.019,0.567l-7.669-7.669C36.366,28.542,37,26.846,37,25s-0.634-3.542-1.688-4.897l9.665-9.665
+                C46.042,11.405,47.451,12,49,12c3.309,0,6-2.691,6-6S52.309,0,49,0z M11,9c0-1.103,0.897-2,2-2s2,0.897,2,2s-0.897,2-2,2
+                S11,10.103,11,9z M6,51c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S8.206,51,6,51z M33,49c0,2.206-1.794,4-4,4s-4-1.794-4-4
+                s1.794-4,4-4S33,46.794,33,49z M29,31c-3.309,0-6-2.691-6-6s2.691-6,6-6s6,2.691,6,6S32.309,31,29,31z M47,41c0,1.103-0.897,2-2,2
+                s-2-0.897-2-2s0.897-2,2-2S47,39.897,47,41z M49,10c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S51.206,10,49,10z"></path></svg></button></div><div class="global-graph-outer"><div class="global-graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:-1,&quot;scale&quot;:0.9,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.2,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:true,&quot;enableRadial&quot;:true}"></div></div></div><div class="toc desktop-only"><button type="button" class="toc-header" aria-controls="toc-6" aria-expanded="true"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-1" class="toc-content overflow"><li class="depth-0"><a href="#trivy" data-for="trivy">Trivy</a></li><li class="depth-1"><a href="#overview" data-for="overview">Overview</a></li><li class="depth-2"><a href="#principais-benefícios-do-trivy-para-imagens-docker-e-arquivos-dockerfile" data-for="principais-benefícios-do-trivy-para-imagens-docker-e-arquivos-dockerfile">Principais benefícios do Trivy para imagens Docker e arquivos Dockerfile</a></li><li class="depth-2"><a href="#boas-práticas-de-utilização-do-trivy" data-for="boas-práticas-de-utilização-do-trivy">Boas práticas de utilização do Trivy</a></li><li class="depth-2"><a href="#instalando-o-trivy" data-for="instalando-o-trivy">Instalando o Trivy</a></li><li class="depth-2"><a href="#como-executar-o-trivy" data-for="como-executar-o-trivy">Como executar o trivy</a></li><li class="depth-1"><a href="#trivy-na-pipeline" data-for="trivy-na-pipeline">Trivy na Pipeline</a></li><li class="depth-2"><a href="#overview-1" data-for="overview-1">Overview</a></li><li class="depth-2"><a href="#implementar-o-trivy-no-pipeline-do-azure-devops" data-for="implementar-o-trivy-no-pipeline-do-azure-devops">implementar o Trivy no pipeline do Azure DevOps</a></li><li class="depth-2"><a href="#recomendações-para-a-integração-do-pipeline-cicd" data-for="recomendações-para-a-integração-do-pipeline-cicd">Recomendações para a integração do pipeline CI/CD</a></li><li class="depth-2"><a href="#exportando-relatorio-para-o-elastic" data-for="exportando-relatorio-para-o-elastic">Exportando relatorio para o Elastic</a></li><li class="depth-1"><a href="#trivy-kubernets-operator" data-for="trivy-kubernets-operator">Trivy Kubernets Operator</a></li><li class="depth-2"><a href="#overview-2" data-for="overview-2">Overview</a></li><li class="depth-2"><a href="#implementando-o-trivy-operator" data-for="implementando-o-trivy-operator">Implementando o Trivy Operator</a></li><li class="depth-1"><a href="#trivy-com-ferramentas-de-observabilidade-como-o-prometheus" data-for="trivy-com-ferramentas-de-observabilidade-como-o-prometheus">Trivy com ferramentas de observabilidade, como o Prometheus</a></li><li class="depth-2"><a href="#integração-do-trivy-operator-com-o-prometheus-stack-kube-prometheus-stack-usando-o-helm" data-for="integração-do-trivy-operator-com-o-prometheus-stack-kube-prometheus-stack-usando-o-helm">Integração do Trivy Operator com o Prometheus Stack (kube-prometheus-stack) usando o Helm</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v4.5.2</a> © 2026</p><ul><li><a href="https://github.com/jackyzha0/quartz">GitHub</a></li><li><a href="https://discord.gg/cRFFHYye7t">Discord Community</a></li></ul></footer></div></div></body><script type="application/javascript" data-persist="true">function n(){let t=this.parentElement;t.classList.toggle("is-collapsed");let e=t.getElementsByClassName("callout-content")[0];if(!e)return;let l=t.classList.contains("is-collapsed");e.style.gridTemplateRows=l?"0fr":"1fr"}function c(){let t=document.getElementsByClassName("callout is-collapsible");for(let e of t){let l=e.getElementsByClassName("callout-title")[0],s=e.getElementsByClassName("callout-content")[0];if(!l||!s)continue;l.addEventListener("click",n),window.addCleanup(()=>l.removeEventListener("click",n));let o=e.classList.contains("is-collapsed");s.style.gridTemplateRows=o?"0fr":"1fr"}}document.addEventListener("nav",c);
+</script><script type="module" data-persist="true">function E(a,e){if(!a)return;function t(o){o.target===this&&(o.preventDefault(),o.stopPropagation(),e())}function n(o){o.key.startsWith("Esc")&&(o.preventDefault(),e())}a?.addEventListener("click",t),window.addCleanup(()=>a?.removeEventListener("click",t)),document.addEventListener("keydown",n),window.addCleanup(()=>document.removeEventListener("keydown",n))}function f(a){for(;a.firstChild;)a.removeChild(a.firstChild)}var m=class{constructor(e,t){this.container=e;this.content=t;this.setupEventListeners(),this.setupNavigationControls(),this.resetTransform()}isDragging=!1;startPan={x:0,y:0};currentPan={x:0,y:0};scale=1;MIN_SCALE=.5;MAX_SCALE=3;cleanups=[];setupEventListeners(){let e=this.onMouseDown.bind(this),t=this.onMouseMove.bind(this),n=this.onMouseUp.bind(this),o=this.onTouchStart.bind(this),r=this.onTouchMove.bind(this),i=this.onTouchEnd.bind(this),s=this.resetTransform.bind(this);this.container.addEventListener("mousedown",e),document.addEventListener("mousemove",t),document.addEventListener("mouseup",n),this.container.addEventListener("touchstart",o,{passive:!1}),document.addEventListener("touchmove",r,{passive:!1}),document.addEventListener("touchend",i),window.addEventListener("resize",s),this.cleanups.push(()=>this.container.removeEventListener("mousedown",e),()=>document.removeEventListener("mousemove",t),()=>document.removeEventListener("mouseup",n),()=>this.container.removeEventListener("touchstart",o),()=>document.removeEventListener("touchmove",r),()=>document.removeEventListener("touchend",i),()=>window.removeEventListener("resize",s))}cleanup(){for(let e of this.cleanups)e()}setupNavigationControls(){let e=document.createElement("div");e.className="mermaid-controls";let t=this.createButton("+",()=>this.zoom(.1)),n=this.createButton("-",()=>this.zoom(-.1)),o=this.createButton("Reset",()=>this.resetTransform());e.appendChild(n),e.appendChild(o),e.appendChild(t),this.container.appendChild(e)}createButton(e,t){let n=document.createElement("button");return n.textContent=e,n.className="mermaid-control-button",n.addEventListener("click",t),window.addCleanup(()=>n.removeEventListener("click",t)),n}onMouseDown(e){e.button===0&&(this.isDragging=!0,this.startPan={x:e.clientX-this.currentPan.x,y:e.clientY-this.currentPan.y},this.container.style.cursor="grabbing")}onMouseMove(e){this.isDragging&&(e.preventDefault(),this.currentPan={x:e.clientX-this.startPan.x,y:e.clientY-this.startPan.y},this.updateTransform())}onMouseUp(){this.isDragging=!1,this.container.style.cursor="grab"}onTouchStart(e){if(e.touches.length!==1)return;this.isDragging=!0;let t=e.touches[0];this.startPan={x:t.clientX-this.currentPan.x,y:t.clientY-this.currentPan.y}}onTouchMove(e){if(!this.isDragging||e.touches.length!==1)return;e.preventDefault();let t=e.touches[0];this.currentPan={x:t.clientX-this.startPan.x,y:t.clientY-this.startPan.y},this.updateTransform()}onTouchEnd(){this.isDragging=!1}zoom(e){let t=Math.min(Math.max(this.scale+e,this.MIN_SCALE),this.MAX_SCALE),n=this.content.getBoundingClientRect(),o=n.width/2,r=n.height/2,i=t-this.scale;this.currentPan.x-=o*i,this.currentPan.y-=r*i,this.scale=t,this.updateTransform()}updateTransform(){this.content.style.transform=`translate(${this.currentPan.x}px, ${this.currentPan.y}px) scale(${this.scale})`}resetTransform(){let t=this.content.querySelector("svg").getBoundingClientRect(),n=t.width/this.scale,o=t.height/this.scale;this.scale=1,this.currentPan={x:(this.container.clientWidth-n)/2,y:(this.container.clientHeight-o)/2},this.updateTransform()}},T=["--secondary","--tertiary","--gray","--light","--lightgray","--highlight","--dark","--darkgray","--codeFont"],y;document.addEventListener("nav",async()=>{let e=document.querySelector(".center").querySelectorAll("code.mermaid");if(e.length===0)return;y||=await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs");let t=y.default,n=new WeakMap;for(let r of e)n.set(r,r.innerText);async function o(){for(let s of e){s.removeAttribute("data-processed");let c=n.get(s);c&&(s.innerHTML=c)}let r=T.reduce((s,c)=>(s[c]=window.getComputedStyle(document.documentElement).getPropertyValue(c),s),{}),i=document.documentElement.getAttribute("saved-theme")==="dark";t.initialize({startOnLoad:!1,securityLevel:"loose",theme:i?"dark":"base",themeVariables:{fontFamily:r["--codeFont"],primaryColor:r["--light"],primaryTextColor:r["--darkgray"],primaryBorderColor:r["--tertiary"],lineColor:r["--darkgray"],secondaryColor:r["--secondary"],tertiaryColor:r["--tertiary"],clusterBkg:r["--light"],edgeLabelBackground:r["--highlight"]}}),await t.run({nodes:e})}await o(),document.addEventListener("themechange",o),window.addCleanup(()=>document.removeEventListener("themechange",o));for(let r=0;r<e.length;r++){let v=function(){let g=l.querySelector("#mermaid-space"),h=l.querySelector(".mermaid-content");if(!h)return;f(h);let w=i.querySelector("svg").cloneNode(!0);h.appendChild(w),l.classList.add("active"),g.style.cursor="grab",u=new m(g,h)},M=function(){l.classList.remove("active"),u?.cleanup(),u=null},i=e[r],s=i.parentElement,c=s.querySelector(".clipboard-button"),d=s.querySelector(".expand-button"),p=window.getComputedStyle(c),L=c.offsetWidth+parseFloat(p.marginLeft||"0")+parseFloat(p.marginRight||"0");d.style.right=`calc(${L}px + 0.3rem)`,s.prepend(d);let l=s.querySelector("#mermaid-container");if(!l)return;let u=null;d.addEventListener("click",v),E(l,M),window.addCleanup(()=>{u?.cleanup(),d.removeEventListener("click",v)})}});
+</script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="./postscript.js" type="module" data-persist="true"></script></html>

@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr"><head><title>guia-completo-autocomplete-local-continuedev-ollama</title><meta charset="utf-8"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="Quartz 4"/><meta property="og:title" content="guia-completo-autocomplete-local-continuedev-ollama"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="guia-completo-autocomplete-local-continuedev-ollama"/><meta name="twitter:description" content="Guia Completo: Autocomplete e Sugestões com Continue.dev e Ollama Crie seu próprio sistema de autocomplete inteligente rodando 100% localmente, sem dependências de APIs externas."/><meta property="og:description" content="Guia Completo: Autocomplete e Sugestões com Continue.dev e Ollama Crie seu próprio sistema de autocomplete inteligente rodando 100% localmente, sem dependências de APIs externas."/><meta property="og:image:alt" content="Guia Completo: Autocomplete e Sugestões com Continue.dev e Ollama Crie seu próprio sistema de autocomplete inteligente rodando 100% localmente, sem dependências de APIs externas."/><meta property="twitter:domain" content="quartz.jzhao.xyz"/><meta property="og:url" content="https://quartz.jzhao.xyz/guia-completo-autocomplete-local-continuedev-ollama"/><meta property="twitter:url" content="https://quartz.jzhao.xyz/guia-completo-autocomplete-local-continuedev-ollama"/><link rel="icon" href="./static/icon.png"/><meta name="description" content="Guia Completo: Autocomplete e Sugestões com Continue.dev e Ollama Crie seu próprio sistema de autocomplete inteligente rodando 100% localmente, sem dependências de APIs externas."/><meta name="generator" content="Quartz"/><link href="./index.css" rel="stylesheet" type="text/css" data-persist="true"/><style>.expand-button {
+  position: absolute;
+  display: flex;
+  float: right;
+  padding: 0.4rem;
+  margin: 0.3rem;
+  right: 0;
+  color: var(--gray);
+  border-color: var(--dark);
+  background-color: var(--light);
+  border: 1px solid;
+  border-radius: 5px;
+  opacity: 0;
+  transition: 0.2s;
+}
+.expand-button > svg {
+  fill: var(--light);
+  filter: contrast(0.3);
+}
+.expand-button:hover {
+  cursor: pointer;
+  border-color: var(--secondary);
+}
+.expand-button:focus {
+  outline: 0;
+}
+
+pre:hover > .expand-button {
+  opacity: 1;
+  transition: 0.2s;
+}
+
+#mermaid-container {
+  position: fixed;
+  contain: layout;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: none;
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.5);
+}
+#mermaid-container.active {
+  display: inline-block;
+}
+#mermaid-container > #mermaid-space {
+  border: 1px solid var(--lightgray);
+  background-color: var(--light);
+  border-radius: 5px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 80vh;
+  width: 80vw;
+  overflow: hidden;
+}
+#mermaid-container > #mermaid-space > .mermaid-content {
+  position: relative;
+  transform-origin: 0 0;
+  transition: transform 0.1s ease;
+  overflow: visible;
+  min-height: 200px;
+  min-width: 200px;
+}
+#mermaid-container > #mermaid-space > .mermaid-content pre {
+  margin: 0;
+  border: none;
+}
+#mermaid-container > #mermaid-space > .mermaid-content svg {
+  max-width: none;
+  height: auto;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--lightgray);
+  background: var(--light);
+  color: var(--dark);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: var(--bodyFont);
+  transition: all 0.2s ease;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:hover {
+  background: var(--lightgray);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:active {
+  transform: translateY(1px);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:nth-child(2) {
+  width: auto;
+  padding: 0 12px;
+  font-size: 14px;
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VSb290IjoiL2hvbWUvcnVubmVyL3dvcmsvQmxvZy9CbG9nL3F1YXJ0ei9jb21wb25lbnRzL3N0eWxlcyIsInNvdXJjZXMiOlsibWVybWFpZC5pbmxpbmUuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7RUFDQTs7QUFHRjtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTs7O0FBS0Y7RUFDRTtFQUNBOzs7QUFJSjtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7O0FBRUE7RUFDRTs7QUFHRjtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7RUFDQTs7QUFHRjtFQUNFO0VBQ0E7O0FBSUo7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFOztBQUdGO0VBQ0U7O0FBSUY7RUFDRTtFQUNBO0VBQ0EiLCJzb3VyY2VzQ29udGVudCI6WyIuZXhwYW5kLWJ1dHRvbiB7XG4gIHBvc2l0aW9uOiBhYnNvbHV0ZTtcbiAgZGlzcGxheTogZmxleDtcbiAgZmxvYXQ6IHJpZ2h0O1xuICBwYWRkaW5nOiAwLjRyZW07XG4gIG1hcmdpbjogMC4zcmVtO1xuICByaWdodDogMDsgLy8gTk9URTogcmlnaHQgd2lsbCBiZSBzZXQgaW4gbWVybWFpZC5pbmxpbmUudHNcbiAgY29sb3I6IHZhcigtLWdyYXkpO1xuICBib3JkZXItY29sb3I6IHZhcigtLWRhcmspO1xuICBiYWNrZ3JvdW5kLWNvbG9yOiB2YXIoLS1saWdodCk7XG4gIGJvcmRlcjogMXB4IHNvbGlkO1xuICBib3JkZXItcmFkaXVzOiA1cHg7XG4gIG9wYWNpdHk6IDA7XG4gIHRyYW5zaXRpb246IDAuMnM7XG5cbiAgJiA+IHN2ZyB7XG4gICAgZmlsbDogdmFyKC0tbGlnaHQpO1xuICAgIGZpbHRlcjogY29udHJhc3QoMC4zKTtcbiAgfVxuXG4gICY6aG92ZXIge1xuICAgIGN1cnNvcjogcG9pbnRlcjtcbiAgICBib3JkZXItY29sb3I6IHZhcigtLXNlY29uZGFyeSk7XG4gIH1cblxuICAmOmZvY3VzIHtcbiAgICBvdXRsaW5lOiAwO1xuICB9XG59XG5cbnByZSB7XG4gICY6aG92ZXIgPiAuZXhwYW5kLWJ1dHRvbiB7XG4gICAgb3BhY2l0eTogMTtcbiAgICB0cmFuc2l0aW9uOiAwLjJzO1xuICB9XG59XG5cbiNtZXJtYWlkLWNvbnRhaW5lciB7XG4gIHBvc2l0aW9uOiBmaXhlZDtcbiAgY29udGFpbjogbGF5b3V0O1xuICB6LWluZGV4OiA5OTk7XG4gIGxlZnQ6IDA7XG4gIHRvcDogMDtcbiAgd2lkdGg6IDEwMHZ3O1xuICBoZWlnaHQ6IDEwMHZoO1xuICBvdmVyZmxvdzogaGlkZGVuO1xuICBkaXNwbGF5OiBub25lO1xuICBiYWNrZHJvcC1maWx0ZXI6IGJsdXIoNHB4KTtcbiAgYmFja2dyb3VuZDogcmdiYSgwLCAwLCAwLCAwLjUpO1xuXG4gICYuYWN0aXZlIHtcbiAgICBkaXNwbGF5OiBpbmxpbmUtYmxvY2s7XG4gIH1cblxuICAmID4gI21lcm1haWQtc3BhY2Uge1xuICAgIGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWxpZ2h0Z3JheSk7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tbGlnaHQpO1xuICAgIGJvcmRlci1yYWRpdXM6IDVweDtcbiAgICBwb3NpdGlvbjogZml4ZWQ7XG4gICAgdG9wOiA1MCU7XG4gICAgbGVmdDogNTAlO1xuICAgIHRyYW5zZm9ybTogdHJhbnNsYXRlKC01MCUsIC01MCUpO1xuICAgIGhlaWdodDogODB2aDtcbiAgICB3aWR0aDogODB2dztcbiAgICBvdmVyZmxvdzogaGlkZGVuO1xuXG4gICAgJiA+IC5tZXJtYWlkLWNvbnRlbnQge1xuICAgICAgcG9zaXRpb246IHJlbGF0aXZlO1xuICAgICAgdHJhbnNmb3JtLW9yaWdpbjogMCAwO1xuICAgICAgdHJhbnNpdGlvbjogdHJhbnNmb3JtIDAuMXMgZWFzZTtcbiAgICAgIG92ZXJmbG93OiB2aXNpYmxlO1xuICAgICAgbWluLWhlaWdodDogMjAwcHg7XG4gICAgICBtaW4td2lkdGg6IDIwMHB4O1xuXG4gICAgICBwcmUge1xuICAgICAgICBtYXJnaW46IDA7XG4gICAgICAgIGJvcmRlcjogbm9uZTtcbiAgICAgIH1cblxuICAgICAgc3ZnIHtcbiAgICAgICAgbWF4LXdpZHRoOiBub25lO1xuICAgICAgICBoZWlnaHQ6IGF1dG87XG4gICAgICB9XG4gICAgfVxuXG4gICAgJiA+IC5tZXJtYWlkLWNvbnRyb2xzIHtcbiAgICAgIHBvc2l0aW9uOiBhYnNvbHV0ZTtcbiAgICAgIGJvdHRvbTogMjBweDtcbiAgICAgIHJpZ2h0OiAyMHB4O1xuICAgICAgZGlzcGxheTogZmxleDtcbiAgICAgIGdhcDogOHB4O1xuICAgICAgcGFkZGluZzogOHB4O1xuICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHQpO1xuICAgICAgYm9yZGVyOiAxcHggc29saWQgdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgIGJvcmRlci1yYWRpdXM6IDZweDtcbiAgICAgIGJveC1zaGFkb3c6IDAgMnB4IDRweCByZ2JhKDAsIDAsIDAsIDAuMSk7XG4gICAgICB6LWluZGV4OiAyO1xuXG4gICAgICAubWVybWFpZC1jb250cm9sLWJ1dHRvbiB7XG4gICAgICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgICAgIGFsaWduLWl0ZW1zOiBjZW50ZXI7XG4gICAgICAgIGp1c3RpZnktY29udGVudDogY2VudGVyO1xuICAgICAgICB3aWR0aDogMzJweDtcbiAgICAgICAgaGVpZ2h0OiAzMnB4O1xuICAgICAgICBwYWRkaW5nOiAwO1xuICAgICAgICBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1saWdodGdyYXkpO1xuICAgICAgICBiYWNrZ3JvdW5kOiB2YXIoLS1saWdodCk7XG4gICAgICAgIGNvbG9yOiB2YXIoLS1kYXJrKTtcbiAgICAgICAgYm9yZGVyLXJhZGl1czogNHB4O1xuICAgICAgICBjdXJzb3I6IHBvaW50ZXI7XG4gICAgICAgIGZvbnQtc2l6ZTogMTZweDtcbiAgICAgICAgZm9udC1mYW1pbHk6IHZhcigtLWJvZHlGb250KTtcbiAgICAgICAgdHJhbnNpdGlvbjogYWxsIDAuMnMgZWFzZTtcblxuICAgICAgICAmOmhvdmVyIHtcbiAgICAgICAgICBiYWNrZ3JvdW5kOiB2YXIoLS1saWdodGdyYXkpO1xuICAgICAgICB9XG5cbiAgICAgICAgJjphY3RpdmUge1xuICAgICAgICAgIHRyYW5zZm9ybTogdHJhbnNsYXRlWSgxcHgpO1xuICAgICAgICB9XG5cbiAgICAgICAgLy8gU3R5bGUgdGhlIHJlc2V0IGJ1dHRvbiBkaWZmZXJlbnRseVxuICAgICAgICAmOm50aC1jaGlsZCgyKSB7XG4gICAgICAgICAgd2lkdGg6IGF1dG87XG4gICAgICAgICAgcGFkZGluZzogMCAxMnB4O1xuICAgICAgICAgIGZvbnQtc2l6ZTogMTRweDtcbiAgICAgICAgfVxuICAgICAgfVxuICAgIH1cbiAgfVxufVxuIl19 */</style><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="./prescript.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("./static/contentIndex.json").then(data => data.json())</script><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="https://quartz.jzhao.xyz/index.xml"/><meta property="og:image:width" content="1200"/><meta property="og:image:height" content="630"/><meta property="og:image" content="https://quartz.jzhao.xyz/guia-completo-autocomplete-local-continuedev-ollama-og-image.webp"/><meta property="og:image:url" content="https://quartz.jzhao.xyz/guia-completo-autocomplete-local-continuedev-ollama-og-image.webp"/><meta name="twitter:image" content="https://quartz.jzhao.xyz/guia-completo-autocomplete-local-continuedev-ollama-og-image.webp"/><meta property="og:image:type" content="image/.webp"/></head><body data-slug="guia-completo-autocomplete-local-continuedev-ollama"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h2 class="page-title"><a href=".">Quartz 4</a></h2><div class="spacer mobile-only"></div><div class="flex-component" style="flex-direction: row; flex-wrap: nowrap; gap: 1rem;"><div style="flex-grow: 1; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><div class="search"><button class="search-button"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>Search</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div class="search-layout" data-preview="true"></div></div></div></div></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="darkmode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="Dark mode"><title>Dark mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="Light mode"><title>Light mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="readermode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="readerIcon" fill="currentColor" stroke="currentColor" stroke-width="0.2" stroke-linecap="round" stroke-linejoin="round" width="64px" height="64px" viewBox="0 0 24 24" aria-label="Reader mode"><title>Reader mode</title><g transform="translate(-1.8, -1.8) scale(1.15, 1.2)"><path d="M8.9891247,2.5 C10.1384702,2.5 11.2209868,2.96705384 12.0049645,3.76669482 C12.7883914,2.96705384 13.8709081,2.5 15.0202536,2.5 L18.7549359,2.5 C19.1691495,2.5 19.5049359,2.83578644 19.5049359,3.25 L19.5046891,4.004 L21.2546891,4.00457396 C21.6343849,4.00457396 21.9481801,4.28672784 21.9978425,4.6528034 L22.0046891,4.75457396 L22.0046891,20.25 C22.0046891,20.6296958 21.7225353,20.943491 21.3564597,20.9931534 L21.2546891,21 L2.75468914,21 C2.37499337,21 2.06119817,20.7178461 2.01153575,20.3517706 L2.00468914,20.25 L2.00468914,4.75457396 C2.00468914,4.37487819 2.28684302,4.061083 2.65291858,4.01142057 L2.75468914,4.00457396 L4.50368914,4.004 L4.50444233,3.25 C4.50444233,2.87030423 4.78659621,2.55650904 5.15267177,2.50684662 L5.25444233,2.5 L8.9891247,2.5 Z M4.50368914,5.504 L3.50468914,5.504 L3.50468914,19.5 L10.9478955,19.4998273 C10.4513189,18.9207296 9.73864328,18.5588115 8.96709342,18.5065584 L8.77307039,18.5 L5.25444233,18.5 C4.87474657,18.5 4.56095137,18.2178461 4.51128895,17.8517706 L4.50444233,17.75 L4.50368914,5.504 Z M19.5049359,17.75 C19.5049359,18.1642136 19.1691495,18.5 18.7549359,18.5 L15.2363079,18.5 C14.3910149,18.5 13.5994408,18.8724714 13.0614828,19.4998273 L20.5046891,19.5 L20.5046891,5.504 L19.5046891,5.504 L19.5049359,17.75 Z M18.0059359,3.999 L15.0202536,4 L14.8259077,4.00692283 C13.9889509,4.06666544 13.2254227,4.50975805 12.7549359,5.212 L12.7549359,17.777 L12.7782651,17.7601316 C13.4923805,17.2719483 14.3447024,17 15.2363079,17 L18.0059359,16.999 L18.0056891,4.798 L18.0033792,4.75457396 L18.0056891,4.71 L18.0059359,3.999 Z M8.9891247,4 L6.00368914,3.999 L6.00599909,4.75457396 L6.00599909,4.75457396 L6.00368914,4.783 L6.00368914,16.999 L8.77307039,17 C9.57551536,17 10.3461406,17.2202781 11.0128313,17.6202194 L11.2536891,17.776 L11.2536891,5.211 C10.8200889,4.56369974 10.1361548,4.13636104 9.37521067,4.02745763 L9.18347055,4.00692283 L8.9891247,4 Z"></path></g></svg></button></div></div><div class="explorer" data-behavior="link" data-collapsed="collapsed" data-savestate="true" data-data-fns="{&quot;order&quot;:[&quot;filter&quot;,&quot;map&quot;,&quot;sort&quot;],&quot;sortFn&quot;:&quot;(a,b)=>!a.isFolder&amp;&amp;!b.isFolder||a.isFolder&amp;&amp;b.isFolder?a.displayName.localeCompare(b.displayName,void 0,{numeric:!0,sensitivity:\&quot;base\&quot;}):!a.isFolder&amp;&amp;b.isFolder?1:-1&quot;,&quot;filterFn&quot;:&quot;node=>node.slugSegment!==\&quot;tags\&quot;&quot;,&quot;mapFn&quot;:&quot;node=>node&quot;}"><button type="button" class="explorer-toggle mobile-explorer hide-until-loaded" data-mobile="true" aria-controls="explorer-171"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-menu"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button><button type="button" class="title-button explorer-toggle desktop-explorer" data-mobile="false" aria-expanded="true"><h2>Explorer</h2><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="explorer-171" class="explorer-content" aria-expanded="false" role="group"><ul class="explorer-ul overflow" id="list-0"><li class="overflow-end"></li></ul></div><template id="template-file"><li><a href="#"></a></li></template><template id="template-folder"><li><div class="folder-container"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="folder-icon"><polyline points="6 9 12 15 18 9"></polyline></svg><div><button class="folder-button"><span class="folder-title"></span></button></div></div><div class="folder-outer"><ul class="content"></ul></div></li></template></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="./">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>guia completo autocomplete local continuedev ollama</a></div></nav><h1 class="article-title">guia-completo-autocomplete-local-continuedev-ollama</h1><p show-comma="true" class="content-meta"><time datetime="2026-05-24T15:59:59.261Z">May 24, 2026</time><span>10 min read</span></p></div></div><article class="popover-hint"><h1 id="guia-completo-autocomplete-e-sugestões-com-continuedev-e-ollama">Guia Completo: Autocomplete e Sugestões com Continue.dev e Ollama<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#guia-completo-autocomplete-e-sugestões-com-continuedev-e-ollama" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h1>
+<blockquote>
+<p>Crie seu próprio sistema de autocomplete inteligente rodando 100% localmente, sem dependências de APIs externas.</p>
+</blockquote>
+<h2 id="introdução">Introdução<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#introdução" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Autocomplete é um superpoder no desenvolvimento moderno. Mas será que você precisa realmente enviar seu código para a nuvem a cada keystroke? A combinação de <strong>Continue.dev</strong> (IDE companion com suporte a modelos locais) e <strong>Ollama</strong> (executor local de LLMs) oferece uma alternativa potente: autocomplete rápido, privado e sob seu controle total.</p>
+<p>Neste guia, você aprenderá a:</p>
+<ul>
+<li>Configurar Continue.dev + Ollama do zero</li>
+<li>Escolher e otimizar modelos LLM para autocomplete</li>
+<li>Tunar parâmetros para equilibrar qualidade vs latência</li>
+<li>Otimizar o uso de GPU para máxima performance</li>
+<li>Monitorar e resolver problemas de performance</li>
+<li>Expandir além do autocomplete com o ecossistema Continue.dev</li>
+</ul>
+<p>Este guia assume uma máquina Linux com GPU NVIDIA e experiência básica com desenvolvimento. Os conceitos, porém, aplicam-se a qualquer setup.</p>
+<hr/>
+<h2 id="parte-1-arquitetura-e-componentes">Parte 1: Arquitetura e Componentes<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#parte-1-arquitetura-e-componentes" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="o-que-é-continuedev">O que é Continue.dev?<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#o-que-é-continuedev" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><a href="https://docs.continue.dev/ide-extensions/install" class="external"><strong>Continue.dev</strong><svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> é um plugin/extension para IDEs (VS Code, JetBrains) que funciona como um “AI coding companion”. Diferentemente de ferramentas cloud-first como GitHub Copilot, Continue.dev é <strong>agnóstico em relação ao modelo</strong>: você escolhe qual LLM usar — seja local (Ollama), remoto (Claude, OpenAI), ou aberto (Mistral, Llama, etc).</p>
+<p>Principais capacidades:</p>
+<ul>
+<li><strong>Autocomplete</strong>: sugestões de código inline enquanto você digita</li>
+<li><strong>Chat</strong>: conversa contextual sobre o código</li>
+<li><strong>Edit</strong>: refactoring assistido</li>
+<li><strong>Slash commands</strong>: ações específicas (test, docs, etc)</li>
+</ul>
+<h3 id="o-que-é-ollama">O que é Ollama?<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#o-que-é-ollama" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>Ollama</strong> é um runtime para executar Large Language Models (LLMs) localmente, sem necessidade de APIs externas. Ele:</p>
+<ul>
+<li>Gerencia download, cache e execução de modelos</li>
+<li>Oferece uma API HTTP simples para integração</li>
+<li>Otimiza automaticamente para CPU/GPU da sua máquina</li>
+<li>Roda modelos em formato GGUF (quantizado, eficiente)</li>
+</ul>
+<h3 id="fluxo-de-dados">Fluxo de Dados<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#fluxo-de-dados" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Você</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> digita</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> código</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> na</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> IDE</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">    ↓</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Continue.dev</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> detecta</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> contexto</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> (função </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">atual,</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> imports,</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> etc</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">    ↓</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Envia</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> para</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> Ollama</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> via</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> HTTP</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> (localhost:11434)</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">    ↓</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Ollama</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> carrega</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> modelo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> em</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> GPU/CPU</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">    ↓</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Modelo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> gera</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> sugestão</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> (50-256 </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">tokens</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">    ↓</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Continue.dev</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> renderiza</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> inline</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> na</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> IDE</span></span></code></pre></figure>
+<p>A latência típica: <strong>50-300ms</strong> dependendo do modelo e hardware.</p>
+<hr/>
+<h2 id="parte-2-sua-stack-de-hardware">Parte 2: Sua Stack de Hardware<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#parte-2-sua-stack-de-hardware" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Para aproveitar este guia ao máximo, conhecer seu hardware é essencial:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Processador:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  AMD</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> Ryzen™</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 7</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> 5700G</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> (16 </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">threads,</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> integrado</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> Radeon</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Memória</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> RAM:</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  32.0</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> GiB</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> (consumo </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">base</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ~10GB</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">GPU:</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">          NVIDIA</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> GeForce</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> RTX™</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 4060</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> Ti</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> (8GB </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">VRAM</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">)</span></span></code></pre></figure>
+<p><strong>Por que isso importa?</strong></p>
+<ul>
+<li><strong>RTX 4060 Ti (8GB)</strong>: Consegue rodar modelos 7-13B quantizados com folga (4.8-6.5GB). Maiores (34B+) necessitam offloading para CPU.</li>
+<li><strong>16 threads</strong>: Suficiente para paralelizar cache de embeddings e fallback para CPU.</li>
+<li><strong>32GB RAM</strong>: Memória total para modelo em VRAM + sistema + browser aberto.</li>
+</ul>
+<p>Se seu hardware é diferente, <strong>ajuste as recomendações proporcionalmente</strong> (veja a seção de troubleshooting).</p>
+<hr/>
+<h2 id="parte-3-instalação-e-configuração-inicial">Parte 3: Instalação e Configuração Inicial<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#parte-3-instalação-e-configuração-inicial" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="passo-1-instalar-ollama">Passo 1: Instalar Ollama<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#passo-1-instalar-ollama" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># No Linux, download direto do site</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">curl</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -fsSL</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> https://ollama.ai/install.sh</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> sh</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Ou via package manager</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">sudo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> apt</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> install</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ollama</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">  # Debian/Ubuntu</span></span></code></pre></figure>
+<p>Verifique:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ollama</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --version</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ollama</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> serve</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">  # Inicia o daemon</span></span></code></pre></figure>
+<p>O Ollama roda por padrão em <code>http://localhost:11434</code>. Deixe rodando em background (systemd, screen, etc).</p>
+<h3 id="passo-2-baixar-modelos">Passo 2: Baixar Modelos<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#passo-2-baixar-modelos" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Para <strong>autocomplete</strong>, você quer um modelo rápido, não muito grande. Recomendações:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Modelo principal (recomendado)</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ollama</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> pull</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> qwen2.5-coder:7b</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Alternativas</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ollama</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> pull</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> codellama:7b</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">          # Treino específico para código</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ollama</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> pull</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> deepseek-coder:6.7b</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">   # Muito rápido, bom custo-benefício</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ollama</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> pull</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> mistral:7b</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">            # Genérico mas versátil</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Modelo de embeddings (para contexto inteligente)</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ollama</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> pull</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> nomic-embed-text:latest</span></span></code></pre></figure>
+<p>Verifique os modelos baixados:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ollama</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> list</span></span></code></pre></figure>
+<h3 id="passo-3-instalar-continuedev">Passo 3: Instalar Continue.dev<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#passo-3-instalar-continuedev" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>Para VS Code:</strong></p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Via marketplace: procure por &quot;Continue&quot;</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Ou instale via CLI:</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">code</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --install-extension</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> Continue.Dev.continue</span></span></code></pre></figure>
+<p><strong>Para JetBrains (IntelliJ, PyCharm, etc):</strong></p>
+<ul>
+<li>Abra Settings → Plugins → Marketplace</li>
+<li>Procure “Continue”</li>
+<li>Instale</li>
+</ul>
+<p>Após instalar, uma aba “Continue” aparecerá na IDE.</p>
+<h3 id="passo-4-configurar-continuedev">Passo 4: Configurar Continue.dev<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#passo-4-configurar-continuedev" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>O arquivo de configuração fica em:</p>
+<ul>
+<li><strong>Linux/Mac</strong>: <code>~/.continue/config.yaml</code></li>
+<li><strong>Windows</strong>: <code>%USERPROFILE%\.continue\config.json</code></li>
+</ul>
+<p>Crie ou edite <code>config.yaml</code>:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="yml" data-theme="github-light github-dark"><code data-language="yml" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">name</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">Local Config</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">version</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">1.0.0</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">schema</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">v1</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">models</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  - </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">name</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">qwen-coder-fast</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    provider</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">ollama</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    model</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">qwen-coder-fast:latest</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    roles</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      - </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">autocomplete</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    autocompleteOptions</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">      debounceDelay</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">350</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">      maxPromptTokens</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">1024</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">      temperature</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">0.2</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">      maxTokens</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">256</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">      topP</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">0.9</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  - </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">name</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">Nomic Embed</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    provider</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">ollama</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    model</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">nomic-embed-text:latest</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    roles</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      - </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">embed</span></span></code></pre></figure>
+<p>Salve e reinicie a IDE. Continue.dev deve reconhecer o Ollama.</p>
+<hr/>
+<h2 id="parte-4-escolhendo-o-modelo-certo">Parte 4: Escolhendo o Modelo Certo<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#parte-4-escolhendo-o-modelo-certo" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Não existe “melhor modelo”. A escolha depende do trade-off entre:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Critério</th><th>Impacto</th><th>Prioridade</th></tr></thead><tbody><tr><td><strong>Latência</strong></td><td>Quanto mais rápido, melhor UX no autocomplete</td><td>🔴 Alta</td></tr><tr><td><strong>Qualidade</strong></td><td>Precisão e relevância das sugestões</td><td>🔴 Alta</td></tr><tr><td><strong>VRAM</strong></td><td>Cabe na sua GPU?</td><td>🟠 Média</td></tr><tr><td><strong>Contexto</strong></td><td>Quantos tokens de código anterior analisa</td><td>🟠 Média</td></tr><tr><td><strong>Custo computacional</strong></td><td>CPU + GPU load enquanto digita</td><td>🟡 Baixa</td></tr></tbody></table></div>
+<h3 id="recomendação-para-rtx-4060-ti-8gb">Recomendação para RTX 4060 Ti (8GB)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#recomendação-para-rtx-4060-ti-8gb" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="yaml" data-theme="github-light github-dark"><code data-language="yaml" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">Modelo Recomendado</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  Nome</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">Qwen2.5-Coder 7B</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  VRAM</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">~4.8 GB</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  Latência</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">80-120ms (RTX 4060 Ti)</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  Qualidade</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">Excelente (treino específico para código)</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  Contexto</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">até 4096 tokens</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">Por quê?</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  ✅ Cabe confortavelmente na VRAM</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  ✅ Treino específico para Python, JavaScript, Go, Rust, etc</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  ✅ Velocidade aceitável para autocomplete</span></span>
+<span data-line><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  ✅ Bom suporte a Continue.dev</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">Alternativas</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  • CodeLlama 7B</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">melhor para C/C++/CUDA</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  • DeepSeek Coder 6.7B</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">mais rápido, qualidade similar</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">  • Mistral 7B</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">genérico, não otimizado para código</span></span></code></pre></figure>
+<hr/>
+<h2 id="parte-5-tuning-de-parâmetros">Parte 5: Tuning de Parâmetros<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#parte-5-tuning-de-parâmetros" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>O arquivo <code>config.yaml</code> do Continue.dev oferece controles finos:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="yaml" data-theme="github-light github-dark"><code data-language="yaml" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">name</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">Local Config</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">version</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">1.0.0</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">schema</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">v1</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">models</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  - </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">name</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">Qwen2.5-Coder 7B</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    provider</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">ollama</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    model</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">qwen2.5-coder:7b</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    roles</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      - </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">autocomplete</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    autocompleteOptions</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">      debounceDelay</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">350</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">          # ms a aguardar após você parar de digitar</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">      maxPromptTokens</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">4096</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">       # máx contexto a enviar ao modelo</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">      onlyMyCode</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">true</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">            # Inclui apenas o código contido no repositório para contextualização.</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">      useCache</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">true</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">              # Ativa cache de respostas</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    defaultCompletionOptions</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">      temperature</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">0.2</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">            # criatividade (0=determinístico, 1=aleatório)</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">      maxTokens</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">512</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">              # tamanho máx da sugestão</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">      topP</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">0.9</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">                   # núcleo de amostragem (controla diversidade)</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  - </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">name</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">Qwen2.5-Coder (Chat)</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    provider</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">ollama</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    model</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">qwen2.5-coder:7b</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    roles</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      - </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">chat</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    completionOptions</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">      temperature</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">0.5</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">            # mais criativo para chat</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">      maxTokens</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">512</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">      topP</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">0.95</span></span></code></pre></figure>
+<h3 id="explicação-de-cada-parâmetro">Explicação de Cada Parâmetro<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#explicação-de-cada-parâmetro" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong><code>debounceDelay: 250</code></strong></p>
+<ul>
+<li>Aguarda 250ms após você parar de digitar antes de chamar o modelo</li>
+<li>Evita sobrecarga com requisições a cada keystroke</li>
+<li>Balanceamento: 250ms é imperceptível, &lt;100ms pode sobrecarregar</li>
+</ul>
+<p><strong><code>maxPromptTokens: 2048</code></strong></p>
+<ul>
+<li>Quantidade máxima de contexto enviado (seu código anterior)</li>
+<li>2048 tokens ≈ 4-8 KB de código</li>
+<li>✅ Bom para funções contextualizadas</li>
+<li>⚠️ Acima de 4096 começa a ficar lento</li>
+</ul>
+<p><strong><code>temperature: 0.3</code> (autocomplete)</strong></p>
+<ul>
+<li>Valores baixos (0.1-0.3): sugestões previsíveis, conservadoras</li>
+<li>Valores altos (0.7-1.0): sugestões criativas, podem ser estranhas</li>
+<li>Para autocomplete, <strong>baixo é melhor</strong> (você quer código que faz sentido)</li>
+<li>Para chat, use 0.5-0.7 (mais conversacional)</li>
+</ul>
+<p><strong><code>maxTokens: 256</code></strong></p>
+<ul>
+<li>Tamanho máximo da sugestão</li>
+<li>256 tokens ≈ 40-60 linhas de código</li>
+<li>Recomendação: 128-256 para autocomplete</li>
+</ul>
+<p><strong><code>topP: 0.9</code> (nucleus sampling)</strong></p>
+<ul>
+<li>Controla diversidade das sugestões</li>
+<li>0.9 significa “considere os tokens que somam 90% de probabilidade”</li>
+<li>Valores altos = mais diversidade, mais risco de erros</li>
+<li>Valores baixos = mais concentrado, mais seguro</li>
+<li>Para autocomplete: 0.85-0.95 é bom</li>
+</ul>
+<h3 id="exemplo-de-tuning-para-diferentes-cenários">Exemplo de Tuning para Diferentes Cenários<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#exemplo-de-tuning-para-diferentes-cenários" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>Scenario A: Máxima Qualidade (latência não importa)</strong></li>
+</ul>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="yaml" data-theme="github-light github-dark"><code data-language="yaml" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">debounceDelay</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">500</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">maxPromptTokens</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">4096</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">temperature</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">0.2</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">maxTokens</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">256</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">topP</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">0.85</span></span></code></pre></figure>
+<ul>
+<li><strong>Scenario B: Máxima Velocidade (qualidade OK)</strong></li>
+</ul>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="yaml" data-theme="github-light github-dark"><code data-language="yaml" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">debounceDelay</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">100</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">maxPromptTokens</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">512</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">temperature</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">0.1</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">maxTokens</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">128</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">topP</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">0.8</span></span></code></pre></figure>
+<ul>
+<li><strong>Scenario C: Balanceado (recomendado)</strong></li>
+</ul>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="yaml" data-theme="github-light github-dark"><code data-language="yaml" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">debounceDelay</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">250</span><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">        # Padrão</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">maxPromptTokens</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">2048</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">temperature</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">0.3</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">maxTokens</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">256</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">topP</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">0.9</span></span></code></pre></figure>
+<hr/>
+<h2 id="parte-6-otimizações-de-gpu">Parte 6: Otimizações de GPU<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#parte-6-otimizações-de-gpu" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>A GPU é o gargalo crítico. Maximizar seu uso reduz latência de 500ms para 80ms.</p>
+<h3 id="monitorar-gpu">Monitorar GPU<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#monitorar-gpu" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Terminal 1: Observe em tempo real</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">watch</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -n</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 0.1</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> nvidia-smi</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Terminal 2: Enquanto você usa a IDE</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Você verá: CUDA, GPU %, Memory %, Temperature</span></span></code></pre></figure>
+<p>Esperado durante autocomplete:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">GPU</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">   100%</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> (saturado)</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Mem</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">   ~5.8</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> GB</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> 8GB</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Temp</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">  60-75°C</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Power</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ~120W</span></span></code></pre></figure>
+<h3 id="criar-modelfile-customizado">Criar Modelfile Customizado<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#criar-modelfile-customizado" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Ollama permite customizar parâmetros de execução. Crie um <code>Modelfile</code>:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="dockerfile" data-theme="github-light github-dark"><code data-language="dockerfile" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Modelfile (sem extensão)</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">FROM</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> qwen2.5-coder:7b</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Contexto: balance entre memória e qualidade</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">PARAMETER num_ctx 2048</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># GPU: força máximo na GPU</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">PARAMETER num_gpu 99</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># CPU: use ~12-14 threads (seu Ryzen tem 16)</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">PARAMETER num_thread 12</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Cache: otimiza hits de KV cache</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">PARAMETER num_batch 128</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">PARAMETER num_ubatch 64</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># LLaMA-specific: numa optimization (se suportado)</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">PARAMETER rope_frequency_base 10000</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">PARAMETER rope_frequency_scale 1</span></span></code></pre></figure>
+<p>Build:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ollama</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> create</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> qwen-coder-optimized</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -f</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ~/.ollama/Modelfile</span></span></code></pre></figure>
+<p>Use em <code>config.yaml</code>:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="yaml" data-theme="github-light github-dark"><code data-language="yaml" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">models</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  - </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">name</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">qwen-coder-optimized</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    provider</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">ollama</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    model</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">qwen-coder-optimized</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    roles</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      - </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">autocomplete</span></span></code></pre></figure>
+<h3 id="verificar-alocação-de-gpu">Verificar Alocação de GPU<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#verificar-alocação-de-gpu" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Depois de iniciar autocomplete, rode:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ollama</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ps</span></span></code></pre></figure>
+<p>Output esperado:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">NAME</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">                       ID</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">              SIZE</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">      PROCESSOR</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">    CONTEXT</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">qwen-coder-optimized</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">       736ac009cbe0</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">    4.8</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> GB</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">    100%</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> GPU</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">     2048</span></span></code></pre></figure>
+<p>Se mostrar <code>100% CPU</code>, seu modelo não está usando GPU. Diagnóstico:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 1. Verifique se CUDA está instalado</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nvidia-smi</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 2. Verifique logs do Ollama</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">journalctl</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -u</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ollama</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -n</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 50</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 3. Force GPU no Modelfile</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Tente: PARAMETER num_gpu 32 (alguns drivers precisam de valores específicos)</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 4. Último recurso: recrie o container</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ollama</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> rm</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> qwen-coder-optimized</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ollama</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> pull</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> qwen2.5-coder:7b</span></span></code></pre></figure>
+<hr/>
+<h2 id="parte-7-embeddings-para-contexto-inteligente">Parte 7: Embeddings para Contexto Inteligente<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#parte-7-embeddings-para-contexto-inteligente" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Até agora, falamos de “contexto = código antes da linha”. Mas <strong>embeddings</strong> trazem contexto semanticamente relevante de todo o projeto.</p>
+<h3 id="como-funciona">Como Funciona<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#como-funciona" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Quando</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> você</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> digita</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> em</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> arquivo_x.py:</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">  ↓</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Ollama</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> extrai</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> embedding</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> (vetor </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">768D</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">) da linha atual</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">  ↓</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Procura</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> por</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> embeddings</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> similares</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> em</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> todo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> o</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> projeto</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">  ↓</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Envia</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> código</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> similar</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> +</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> o</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> código</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> anterior</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ao</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> modelo</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">  ↓</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">Modelo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> gera</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> sugestão</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> mais</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> contextualizada</span></span></code></pre></figure>
+<h3 id="configurar-embeddings">Configurar Embeddings<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#configurar-embeddings" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>No <code>config.yaml</code>:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="yml" data-theme="github-light github-dark"><code data-language="yml" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">models</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  - </span><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">name</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">Nomic Embed</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    provider</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">ollama</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    model</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">: </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">nomic-embed-text:latest</span></span>
+<span data-line><span style="--shiki-light:#22863A;--shiki-dark:#85E89D;">    roles</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">:</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">      - </span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">embed</span></span></code></pre></figure>
+<p>Baixe o modelo (pequeno, ~300MB):</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ollama</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> pull</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> nomic-embed-text:latest</span></span></code></pre></figure>
+<p><strong>Vantagens:</strong></p>
+<ul>
+<li>Sugestões mais relevantes (entende semântica, não apenas sintaxe)</li>
+<li>Código similar de outras partes do projeto é descoberto automaticamente</li>
+<li>Sem overhead de latência (embeddings são rápidos)</li>
+</ul>
+<p><strong>Desvantagem:</strong></p>
+<ul>
+<li>Usa RAM/VRAM adicional (~500MB)</li>
+</ul>
+<hr/>
+<h2 id="parte-8-troubleshooting-e-monitoramento">Parte 8: Troubleshooting e Monitoramento<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#parte-8-troubleshooting-e-monitoramento" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="problema-autocomplete-lento-500ms">Problema: Autocomplete Lento (>500ms)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#problema-autocomplete-lento-500ms" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p><strong>Diagnóstico:</strong></p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 1. Verifique GPU</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">nvidia-smi</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Se Memory &lt; 4GB em uso: modelo não está na GPU</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 2. Verifique CPU</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">top</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -b</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -n</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 1</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> head</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -n</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 20</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Se CPU 100%, GPU 0%: rodar em CPU (muito lento)</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 3. Verifique logs</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">tail</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -f</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ~/.ollama/logs/server.log</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># ou</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">journalctl</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -u</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ollama</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -f</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 4. Teste Ollama diretamente</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">curl</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -X</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> POST</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> http://localhost:11434/api/generate</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  -H</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;Content-Type: application/json&quot;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  -d</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> '{&quot;model&quot;:&quot;qwen2.5-coder:7b&quot;,&quot;prompt&quot;:&quot;def hello():\n&quot;,&quot;stream&quot;:false}'</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">  |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> jq</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> '.response'</span></span></code></pre></figure>
+<p><strong>Soluções Comuns:</strong></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th>Sintoma</th><th>Causa</th><th>Solução</th></tr></thead><tbody><tr><td>Latência 500-800ms</td><td>Modelo em CPU</td><td>Aumentar VRAM ou usar modelo menor</td></tr><tr><td>Latência 200-300ms</td><td>Esperado em primeira requisição</td><td>Cache warming, normal</td></tr><tr><td>Latência oscila (100-500ms)</td><td>Modelo em VRAM + swap</td><td>Reduzir maxPromptTokens</td></tr><tr><td>Crashes da IDE</td><td>OOM (out of memory)</td><td>Reduzir maxPromptTokens ou context size</td></tr></tbody></table></div>
+<h3 id="problema-ollama-não-detectado">Problema: Ollama Não Detectado<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#problema-ollama-não-detectado" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 1. Verifique se Ollama está rodando</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">curl</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -s</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> http://localhost:11434/api/tags</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> |</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;"> jq</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> .</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 2. Se falhar, inicie Ollama</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">ollama</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> serve</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 3. Se Ollama crasha, verifique logs</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">journalctl</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -u</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ollama</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> -n</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 100</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># 4. Possível conflito de porta</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># Mude em ~/.ollama/server.conf</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># export OLLAMA_HOST=127.0.0.1:11434</span></span></code></pre></figure>
+<h3 id="monitoramento-contínuo">Monitoramento Contínuo<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#monitoramento-contínuo" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<p>Script para monitorar performance:</p>
+<figure data-rehype-pretty-code-figure><pre tabindex="0" data-language="bash" data-theme="github-light github-dark"><code data-language="bash" data-theme="github-light github-dark" style="display:grid;"><span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">#!/bin/bash</span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;"># monitor_autocomplete.sh</span></span>
+<span data-line> </span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">while</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> true</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">; </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">do</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">  echo</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;=== $(</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">date</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;">) ===&quot;</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  </span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">  # GPU</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">  nvidia-smi</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> --query-gpu=index,name,memory.used,memory.total,utilization.gpu,temperature.gpu</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">    --format=csv,noheader</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  </span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">  # Ollama</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">  ollama</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> ps</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  </span></span>
+<span data-line><span style="--shiki-light:#6A737D;--shiki-dark:#6A737D;">  # Latência (testa modelo)</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">  time</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;"> curl -s -X POST http://localhost:11434/api/generate </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">\</span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">    -H</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> &quot;Content-Type: application/json&quot;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> \</span></span>
+<span data-line><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;">    -d</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> '{&quot;model&quot;:&quot;qwen2.5-coder:7b&quot;,&quot;prompt&quot;:&quot;def &quot;,&quot;stream&quot;:false}'</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;"> ></span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF;"> /dev/null</span></span>
+<span data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8;">  </span></span>
+<span data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0;">  sleep</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF;"> 5</span></span>
+<span data-line><span style="--shiki-light:#D73A49;--shiki-dark:#F97583;">done</span></span></code></pre></figure>
+<hr/>
+<h2 id="parte-9-checklist-de-instalação">Parte 9: Checklist de Instalação<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#parte-9-checklist-de-instalação" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Use este checklist para garantir tudo funciona:</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled/> Ollama instalado e rodando (<code>ollama serve</code>)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Modelos baixados (<code>ollama pull qwen2.5-coder:7b</code> + <code>nomic-embed-text</code>)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Continue.dev instalado na IDE</li>
+<li class="task-list-item"><input type="checkbox" disabled/> <code>~/.continue/config.yaml</code> configurado</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Ollama conectado (<code>curl http://localhost:11434/api/tags</code>)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> First autocomplete testado (digitar função no editor)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> GPU confirmada em uso (<code>nvidia-smi</code> mostra GPU %)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Latência aceitável (&lt;300ms)</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Embeddings habilitados e funcionando</li>
+<li class="task-list-item"><input type="checkbox" disabled/> Chat testado (seleção de código + prompt)</li>
+</ul>
+<hr/>
+<h2 id="parte-10-próximos-passos">Parte 10: Próximos Passos<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#parte-10-próximos-passos" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<h3 id="curto-prazo-semana-1">Curto Prazo (Semana 1)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#curto-prazo-semana-1" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ol>
+<li><strong>Customize debounceDelay</strong> para seu gosto (tente 100, 250, 500)</li>
+<li><strong>Experimente maxPromptTokens</strong> (512, 1024, 2048) — qual latência você prefere?</li>
+<li><strong>Teste modelos alternativos</strong> (CodeLlama, DeepSeek) se não gostar de Qwen</li>
+</ol>
+<h3 id="médio-prazo-mês-1">Médio Prazo (Mês 1)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#médio-prazo-mês-1" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ol>
+<li><strong>Integre com seu workflow</strong> — slash commands customizados para suas tarefas</li>
+<li><strong>Compare qualidade</strong> — guarde exemplos de sugestões boas/ruins, ajuste parâmetros</li>
+<li><strong>Monitore recursos</strong> — acompanhe uso de RAM/GPU/CPU para otimizar</li>
+</ol>
+<h3 id="longo-prazo-contínuo">Longo Prazo (Contínuo)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#longo-prazo-contínuo" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ol>
+<li><strong>Explore RAG/embeddings avançados</strong> para projetos grandes</li>
+<li><strong>Considere fine-tuning</strong> de modelos se tem tarefas específicas (linguagens raras, padrões de código únicos)</li>
+<li><strong>Integre com CI/CD</strong> — use Continue.dev em scripts de fix de código</li>
+</ol>
+<hr/>
+<h2 id="conclusão">Conclusão<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#conclusão" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Você agora tem um sistema de <strong>autocomplete inteligente, privado e rápido</strong> rodando 100% localmente. Não é Copilot, mas oferece:</p>
+<p>✅ <strong>Privacidade</strong>: seu código nunca sai da máquina<br/>
+✅ <strong>Controle</strong>: você escolhe modelo, parâmetros, tudo<br/>
+✅ <strong>Velocidade</strong>: 80-120ms é mais rápido que muitos serviços cloud (Variado)
+✅ <strong>Custo</strong>: zero (depois da GPU amortizada)<br/>
+✅ <strong>Extensibilidade</strong>: customize conforme precisa</p>
+<p><strong>Próximo passo recomendado:</strong> Instale tudo, teste durante uma semana, e ajuste <code>debounceDelay</code> + <code>temperature</code> até sentir natural. Não existe configuração “perfeita” — existe configuração que funciona para <em>seu</em> estilo de programação.</p>
+<hr/>
+<h2 id="referências">Referências<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#referências" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<ul>
+<li><a href="https://docs.continue.dev" class="external">Continue.dev Docs<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — documentação oficial</li>
+<li><a href="https://ollama.ai" class="external">Ollama Docs<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — guias e modelos disponíveis</li>
+<li><a href="https://huggingface.co/Qwen/Qwen2.5-Coder" class="external">Qwen2.5-Coder<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — modelo recomendado</li>
+<li><a href="https://www.nomic.ai/blog/nomic-embed-text-v1" class="external">Nomic Embed<svg aria-hidden="true" class="external-icon" style="max-width:0.8em;max-height:0.8em;" viewBox="0 0 512 512"><path d="M320 0H288V64h32 82.7L201.4 265.4 178.7 288 224 333.3l22.6-22.6L448 109.3V192v32h64V192 32 0H480 320zM32 32H0V64 480v32H32 456h32V480 352 320H424v32 96H64V96h96 32V32H160 32z"></path></svg></a> — embeddings eficientes</li>
+</ul>
+<p>Boa sorte com seu autocomplete local! 🚀</p></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="graph"><h3>Graph View</h3><div class="graph-outer"><div class="graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:1,&quot;scale&quot;:1.1,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.3,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:false,&quot;enableRadial&quot;:false}"></div><button class="global-graph-icon" aria-label="Global Graph"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55 55" fill="currentColor" xml:space="preserve"><path d="M49,0c-3.309,0-6,2.691-6,6c0,1.035,0.263,2.009,0.726,2.86l-9.829,9.829C32.542,17.634,30.846,17,29,17
+                s-3.542,0.634-4.898,1.688l-7.669-7.669C16.785,10.424,17,9.74,17,9c0-2.206-1.794-4-4-4S9,6.794,9,9s1.794,4,4,4
+                c0.74,0,1.424-0.215,2.019-0.567l7.669,7.669C21.634,21.458,21,23.154,21,25s0.634,3.542,1.688,4.897L10.024,42.562
+                C8.958,41.595,7.549,41,6,41c-3.309,0-6,2.691-6,6s2.691,6,6,6s6-2.691,6-6c0-1.035-0.263-2.009-0.726-2.86l12.829-12.829
+                c1.106,0.86,2.44,1.436,3.898,1.619v10.16c-2.833,0.478-5,2.942-5,5.91c0,3.309,2.691,6,6,6s6-2.691,6-6c0-2.967-2.167-5.431-5-5.91
+                v-10.16c1.458-0.183,2.792-0.759,3.898-1.619l7.669,7.669C41.215,39.576,41,40.26,41,41c0,2.206,1.794,4,4,4s4-1.794,4-4
+                s-1.794-4-4-4c-0.74,0-1.424,0.215-2.019,0.567l-7.669-7.669C36.366,28.542,37,26.846,37,25s-0.634-3.542-1.688-4.897l9.665-9.665
+                C46.042,11.405,47.451,12,49,12c3.309,0,6-2.691,6-6S52.309,0,49,0z M11,9c0-1.103,0.897-2,2-2s2,0.897,2,2s-0.897,2-2,2
+                S11,10.103,11,9z M6,51c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S8.206,51,6,51z M33,49c0,2.206-1.794,4-4,4s-4-1.794-4-4
+                s1.794-4,4-4S33,46.794,33,49z M29,31c-3.309,0-6-2.691-6-6s2.691-6,6-6s6,2.691,6,6S32.309,31,29,31z M47,41c0,1.103-0.897,2-2,2
+                s-2-0.897-2-2s0.897-2,2-2S47,39.897,47,41z M49,10c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S51.206,10,49,10z"></path></svg></button></div><div class="global-graph-outer"><div class="global-graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:-1,&quot;scale&quot;:0.9,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.2,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:true,&quot;enableRadial&quot;:true}"></div></div></div><div class="toc desktop-only"><button type="button" class="toc-header" aria-controls="toc-64" aria-expanded="true"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-1" class="toc-content overflow"><li class="depth-0"><a href="#guia-completo-autocomplete-e-sugestões-com-continuedev-e-ollama" data-for="guia-completo-autocomplete-e-sugestões-com-continuedev-e-ollama">Guia Completo: Autocomplete e Sugestões com Continue.dev e Ollama</a></li><li class="depth-1"><a href="#introdução" data-for="introdução">Introdução</a></li><li class="depth-1"><a href="#parte-1-arquitetura-e-componentes" data-for="parte-1-arquitetura-e-componentes">Parte 1: Arquitetura e Componentes</a></li><li class="depth-2"><a href="#o-que-é-continuedev" data-for="o-que-é-continuedev">O que é Continue.dev?</a></li><li class="depth-2"><a href="#o-que-é-ollama" data-for="o-que-é-ollama">O que é Ollama?</a></li><li class="depth-2"><a href="#fluxo-de-dados" data-for="fluxo-de-dados">Fluxo de Dados</a></li><li class="depth-1"><a href="#parte-2-sua-stack-de-hardware" data-for="parte-2-sua-stack-de-hardware">Parte 2: Sua Stack de Hardware</a></li><li class="depth-1"><a href="#parte-3-instalação-e-configuração-inicial" data-for="parte-3-instalação-e-configuração-inicial">Parte 3: Instalação e Configuração Inicial</a></li><li class="depth-2"><a href="#passo-1-instalar-ollama" data-for="passo-1-instalar-ollama">Passo 1: Instalar Ollama</a></li><li class="depth-2"><a href="#passo-2-baixar-modelos" data-for="passo-2-baixar-modelos">Passo 2: Baixar Modelos</a></li><li class="depth-2"><a href="#passo-3-instalar-continuedev" data-for="passo-3-instalar-continuedev">Passo 3: Instalar Continue.dev</a></li><li class="depth-2"><a href="#passo-4-configurar-continuedev" data-for="passo-4-configurar-continuedev">Passo 4: Configurar Continue.dev</a></li><li class="depth-1"><a href="#parte-4-escolhendo-o-modelo-certo" data-for="parte-4-escolhendo-o-modelo-certo">Parte 4: Escolhendo o Modelo Certo</a></li><li class="depth-2"><a href="#recomendação-para-rtx-4060-ti-8gb" data-for="recomendação-para-rtx-4060-ti-8gb">Recomendação para RTX 4060 Ti (8GB)</a></li><li class="depth-1"><a href="#parte-5-tuning-de-parâmetros" data-for="parte-5-tuning-de-parâmetros">Parte 5: Tuning de Parâmetros</a></li><li class="depth-2"><a href="#explicação-de-cada-parâmetro" data-for="explicação-de-cada-parâmetro">Explicação de Cada Parâmetro</a></li><li class="depth-2"><a href="#exemplo-de-tuning-para-diferentes-cenários" data-for="exemplo-de-tuning-para-diferentes-cenários">Exemplo de Tuning para Diferentes Cenários</a></li><li class="depth-1"><a href="#parte-6-otimizações-de-gpu" data-for="parte-6-otimizações-de-gpu">Parte 6: Otimizações de GPU</a></li><li class="depth-2"><a href="#monitorar-gpu" data-for="monitorar-gpu">Monitorar GPU</a></li><li class="depth-2"><a href="#criar-modelfile-customizado" data-for="criar-modelfile-customizado">Criar Modelfile Customizado</a></li><li class="depth-2"><a href="#verificar-alocação-de-gpu" data-for="verificar-alocação-de-gpu">Verificar Alocação de GPU</a></li><li class="depth-1"><a href="#parte-7-embeddings-para-contexto-inteligente" data-for="parte-7-embeddings-para-contexto-inteligente">Parte 7: Embeddings para Contexto Inteligente</a></li><li class="depth-2"><a href="#como-funciona" data-for="como-funciona">Como Funciona</a></li><li class="depth-2"><a href="#configurar-embeddings" data-for="configurar-embeddings">Configurar Embeddings</a></li><li class="depth-1"><a href="#parte-8-troubleshooting-e-monitoramento" data-for="parte-8-troubleshooting-e-monitoramento">Parte 8: Troubleshooting e Monitoramento</a></li><li class="depth-2"><a href="#problema-autocomplete-lento-500ms" data-for="problema-autocomplete-lento-500ms">Problema: Autocomplete Lento (>500ms)</a></li><li class="depth-2"><a href="#problema-ollama-não-detectado" data-for="problema-ollama-não-detectado">Problema: Ollama Não Detectado</a></li><li class="depth-2"><a href="#monitoramento-contínuo" data-for="monitoramento-contínuo">Monitoramento Contínuo</a></li><li class="depth-1"><a href="#parte-9-checklist-de-instalação" data-for="parte-9-checklist-de-instalação">Parte 9: Checklist de Instalação</a></li><li class="depth-1"><a href="#parte-10-próximos-passos" data-for="parte-10-próximos-passos">Parte 10: Próximos Passos</a></li><li class="depth-2"><a href="#curto-prazo-semana-1" data-for="curto-prazo-semana-1">Curto Prazo (Semana 1)</a></li><li class="depth-2"><a href="#médio-prazo-mês-1" data-for="médio-prazo-mês-1">Médio Prazo (Mês 1)</a></li><li class="depth-2"><a href="#longo-prazo-contínuo" data-for="longo-prazo-contínuo">Longo Prazo (Contínuo)</a></li><li class="depth-1"><a href="#conclusão" data-for="conclusão">Conclusão</a></li><li class="depth-1"><a href="#referências" data-for="referências">Referências</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v4.5.2</a> © 2026</p><ul><li><a href="https://github.com/jackyzha0/quartz">GitHub</a></li><li><a href="https://discord.gg/cRFFHYye7t">Discord Community</a></li></ul></footer></div></div></body><script type="application/javascript" data-persist="true">function n(){let t=this.parentElement;t.classList.toggle("is-collapsed");let e=t.getElementsByClassName("callout-content")[0];if(!e)return;let l=t.classList.contains("is-collapsed");e.style.gridTemplateRows=l?"0fr":"1fr"}function c(){let t=document.getElementsByClassName("callout is-collapsible");for(let e of t){let l=e.getElementsByClassName("callout-title")[0],s=e.getElementsByClassName("callout-content")[0];if(!l||!s)continue;l.addEventListener("click",n),window.addCleanup(()=>l.removeEventListener("click",n));let o=e.classList.contains("is-collapsed");s.style.gridTemplateRows=o?"0fr":"1fr"}}document.addEventListener("nav",c);
+</script><script type="module" data-persist="true">function E(a,e){if(!a)return;function t(o){o.target===this&&(o.preventDefault(),o.stopPropagation(),e())}function n(o){o.key.startsWith("Esc")&&(o.preventDefault(),e())}a?.addEventListener("click",t),window.addCleanup(()=>a?.removeEventListener("click",t)),document.addEventListener("keydown",n),window.addCleanup(()=>document.removeEventListener("keydown",n))}function f(a){for(;a.firstChild;)a.removeChild(a.firstChild)}var m=class{constructor(e,t){this.container=e;this.content=t;this.setupEventListeners(),this.setupNavigationControls(),this.resetTransform()}isDragging=!1;startPan={x:0,y:0};currentPan={x:0,y:0};scale=1;MIN_SCALE=.5;MAX_SCALE=3;cleanups=[];setupEventListeners(){let e=this.onMouseDown.bind(this),t=this.onMouseMove.bind(this),n=this.onMouseUp.bind(this),o=this.onTouchStart.bind(this),r=this.onTouchMove.bind(this),i=this.onTouchEnd.bind(this),s=this.resetTransform.bind(this);this.container.addEventListener("mousedown",e),document.addEventListener("mousemove",t),document.addEventListener("mouseup",n),this.container.addEventListener("touchstart",o,{passive:!1}),document.addEventListener("touchmove",r,{passive:!1}),document.addEventListener("touchend",i),window.addEventListener("resize",s),this.cleanups.push(()=>this.container.removeEventListener("mousedown",e),()=>document.removeEventListener("mousemove",t),()=>document.removeEventListener("mouseup",n),()=>this.container.removeEventListener("touchstart",o),()=>document.removeEventListener("touchmove",r),()=>document.removeEventListener("touchend",i),()=>window.removeEventListener("resize",s))}cleanup(){for(let e of this.cleanups)e()}setupNavigationControls(){let e=document.createElement("div");e.className="mermaid-controls";let t=this.createButton("+",()=>this.zoom(.1)),n=this.createButton("-",()=>this.zoom(-.1)),o=this.createButton("Reset",()=>this.resetTransform());e.appendChild(n),e.appendChild(o),e.appendChild(t),this.container.appendChild(e)}createButton(e,t){let n=document.createElement("button");return n.textContent=e,n.className="mermaid-control-button",n.addEventListener("click",t),window.addCleanup(()=>n.removeEventListener("click",t)),n}onMouseDown(e){e.button===0&&(this.isDragging=!0,this.startPan={x:e.clientX-this.currentPan.x,y:e.clientY-this.currentPan.y},this.container.style.cursor="grabbing")}onMouseMove(e){this.isDragging&&(e.preventDefault(),this.currentPan={x:e.clientX-this.startPan.x,y:e.clientY-this.startPan.y},this.updateTransform())}onMouseUp(){this.isDragging=!1,this.container.style.cursor="grab"}onTouchStart(e){if(e.touches.length!==1)return;this.isDragging=!0;let t=e.touches[0];this.startPan={x:t.clientX-this.currentPan.x,y:t.clientY-this.currentPan.y}}onTouchMove(e){if(!this.isDragging||e.touches.length!==1)return;e.preventDefault();let t=e.touches[0];this.currentPan={x:t.clientX-this.startPan.x,y:t.clientY-this.startPan.y},this.updateTransform()}onTouchEnd(){this.isDragging=!1}zoom(e){let t=Math.min(Math.max(this.scale+e,this.MIN_SCALE),this.MAX_SCALE),n=this.content.getBoundingClientRect(),o=n.width/2,r=n.height/2,i=t-this.scale;this.currentPan.x-=o*i,this.currentPan.y-=r*i,this.scale=t,this.updateTransform()}updateTransform(){this.content.style.transform=`translate(${this.currentPan.x}px, ${this.currentPan.y}px) scale(${this.scale})`}resetTransform(){let t=this.content.querySelector("svg").getBoundingClientRect(),n=t.width/this.scale,o=t.height/this.scale;this.scale=1,this.currentPan={x:(this.container.clientWidth-n)/2,y:(this.container.clientHeight-o)/2},this.updateTransform()}},T=["--secondary","--tertiary","--gray","--light","--lightgray","--highlight","--dark","--darkgray","--codeFont"],y;document.addEventListener("nav",async()=>{let e=document.querySelector(".center").querySelectorAll("code.mermaid");if(e.length===0)return;y||=await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs");let t=y.default,n=new WeakMap;for(let r of e)n.set(r,r.innerText);async function o(){for(let s of e){s.removeAttribute("data-processed");let c=n.get(s);c&&(s.innerHTML=c)}let r=T.reduce((s,c)=>(s[c]=window.getComputedStyle(document.documentElement).getPropertyValue(c),s),{}),i=document.documentElement.getAttribute("saved-theme")==="dark";t.initialize({startOnLoad:!1,securityLevel:"loose",theme:i?"dark":"base",themeVariables:{fontFamily:r["--codeFont"],primaryColor:r["--light"],primaryTextColor:r["--darkgray"],primaryBorderColor:r["--tertiary"],lineColor:r["--darkgray"],secondaryColor:r["--secondary"],tertiaryColor:r["--tertiary"],clusterBkg:r["--light"],edgeLabelBackground:r["--highlight"]}}),await t.run({nodes:e})}await o(),document.addEventListener("themechange",o),window.addCleanup(()=>document.removeEventListener("themechange",o));for(let r=0;r<e.length;r++){let v=function(){let g=l.querySelector("#mermaid-space"),h=l.querySelector(".mermaid-content");if(!h)return;f(h);let w=i.querySelector("svg").cloneNode(!0);h.appendChild(w),l.classList.add("active"),g.style.cursor="grab",u=new m(g,h)},M=function(){l.classList.remove("active"),u?.cleanup(),u=null},i=e[r],s=i.parentElement,c=s.querySelector(".clipboard-button"),d=s.querySelector(".expand-button"),p=window.getComputedStyle(c),L=c.offsetWidth+parseFloat(p.marginLeft||"0")+parseFloat(p.marginRight||"0");d.style.right=`calc(${L}px + 0.3rem)`,s.prepend(d);let l=s.querySelector("#mermaid-container");if(!l)return;let u=null;d.addEventListener("click",v),E(l,M),window.addCleanup(()=>{u?.cleanup(),d.removeEventListener("click",v)})}});
+</script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="./postscript.js" type="module" data-persist="true"></script></html>

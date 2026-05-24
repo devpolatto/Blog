@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+    <channel>
+      <title>Quartz 4</title>
+      <link>https://quartz.jzhao.xyz</link>
+      <description>Last 10 notes on Quartz 4</description>
+      <generator>Quartz -- quartz.jzhao.xyz</generator>
+      <item>
+    <title>guia-completo-autocomplete-local-continuedev-ollama</title>
+    <link>https://quartz.jzhao.xyz/guia-completo-autocomplete-local-continuedev-ollama</link>
+    <guid>https://quartz.jzhao.xyz/guia-completo-autocomplete-local-continuedev-ollama</guid>
+    <description><![CDATA[ Guia Completo: Autocomplete e Sugestões com Continue.dev e Ollama Crie seu próprio sistema de autocomplete inteligente rodando 100% localmente, sem dependências de APIs externas. ]]></description>
+    <pubDate>Sun, 24 May 2026 15:59:59 GMT</pubDate>
+  </item><item>
+    <title>Bem-vindo ao meu site pessoal</title>
+    <link>https://quartz.jzhao.xyz/</link>
+    <guid>https://quartz.jzhao.xyz/</guid>
+    <description><![CDATA[ DevSecOps e Cloud Architecture ]]></description>
+    <pubDate>Sun, 24 May 2026 15:59:59 GMT</pubDate>
+  </item><item>
+    <title>Usando jq para analisar logs NDJSON</title>
+    <link>https://quartz.jzhao.xyz/jq_for_ndjson_log</link>
+    <guid>https://quartz.jzhao.xyz/jq_for_ndjson_log</guid>
+    <description><![CDATA[ O que é NDJSON? NDJSON (Newline Delimited JSON) é um formato de arquivo onde cada linha é um objeto JSON separado. ]]></description>
+    <pubDate>Sun, 24 May 2026 15:59:59 GMT</pubDate>
+  </item><item>
+    <title>Padronização de Logs</title>
+    <link>https://quartz.jzhao.xyz/starndard_logging</link>
+    <guid>https://quartz.jzhao.xyz/starndard_logging</guid>
+    <description><![CDATA[ Este documento serve como um guia abrangente para a criação, manutenção e análise de logs em sistemas de software. ]]></description>
+    <pubDate>Sun, 24 May 2026 15:59:59 GMT</pubDate>
+  </item><item>
+    <title>Teste Deploy</title>
+    <link>https://quartz.jzhao.xyz/teste_deploy</link>
+    <guid>https://quartz.jzhao.xyz/teste_deploy</guid>
+    <description><![CDATA[  ]]></description>
+    <pubDate>Sun, 24 May 2026 15:59:59 GMT</pubDate>
+  </item><item>
+    <title>VSCode</title>
+    <link>https://quartz.jzhao.xyz/VSCode</link>
+    <guid>https://quartz.jzhao.xyz/VSCode</guid>
+    <description><![CDATA[ Configurações do meui VSCode Aqui estão algumas das minhas configurações favoritas do VSCode para melhorar a produtividade e a experiência de codificação: settings.json { &quot;editor.lineHeight&quot;: 24, &quot;editor.tabSize&quot;: 5, &quot;editor.insertSpaces&quot;: true, &quot;editor.renderWhite... ]]></description>
+    <pubDate>Sun, 24 May 2026 15:59:59 GMT</pubDate>
+  </item><item>
+    <title>Resize de um Persistent Volume</title>
+    <link>https://quartz.jzhao.xyz/Kubernets/Volumes/Resize-de-um-Persistent-Volume</link>
+    <guid>https://quartz.jzhao.xyz/Kubernets/Volumes/Resize-de-um-Persistent-Volume</guid>
+    <description><![CDATA[ Você tem um PVC (PersistentVolumeClaim) de 8Gi no Kubernetes que está cheio e deseja expandi-lo para 16Gi sem tempo de inatividade e sem interromper o workload. ]]></description>
+    <pubDate>Sun, 24 May 2026 15:59:59 GMT</pubDate>
+  </item><item>
+    <title>Daily commands</title>
+    <link>https://quartz.jzhao.xyz/Kubernets/daily_commands</link>
+    <guid>https://quartz.jzhao.xyz/Kubernets/daily_commands</guid>
+    <description><![CDATA[ Recupera todos os recursos kubectl get all -n marketplace ⚠️ Importante: kubectl get all não mostra tudo (ex: ConfigMaps, Secrets, Ingress). ]]></description>
+    <pubDate>Sun, 24 May 2026 15:59:59 GMT</pubDate>
+  </item><item>
+    <title>Estouro de memória no cgroup</title>
+    <link>https://quartz.jzhao.xyz/Kubernets/inicidentes/Memory_cgroup_out_of_memory</link>
+    <guid>https://quartz.jzhao.xyz/Kubernets/inicidentes/Memory_cgroup_out_of_memory</guid>
+    <description><![CDATA[ O que é um Memory cgroup out of memory (estouro de memória no cgroup), como ele ocorre e como lidar com ele em um ambiente Kubernetes. ]]></description>
+    <pubDate>Sun, 24 May 2026 15:59:59 GMT</pubDate>
+  </item><item>
+    <title>Falha de CORS ao acessar um serviço exposto pelo Istio</title>
+    <link>https://quartz.jzhao.xyz/Kubernets/inicidentes/falha_de_cors_no_istio</link>
+    <guid>https://quartz.jzhao.xyz/Kubernets/inicidentes/falha_de_cors_no_istio</guid>
+    <description><![CDATA[ Descrição do Problema CORS Error em endpoint específico (PATCH) do serviço admin-api-hub – Falha de Preflight OPTIONS bloqueada por AuthorizationPolicy Istio Um único endpoint (/api/users/useradminaccount/{id}/useradminroleids) estava retornando erro de CORS apenas no browser (Firefox/Chrome) quando... ]]></description>
+    <pubDate>Sun, 24 May 2026 15:59:59 GMT</pubDate>
+  </item>
+    </channel>
+  </rss>
