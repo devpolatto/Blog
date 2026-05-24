@@ -23,13 +23,13 @@ jobs:
 
     steps:
       - name: Checkout Blog (código-fonte)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: v4 # branch principal do seu blog
           fetch-depth: 0 # histórico completo (necessário para o Quartz)
 
       - name: Checkout DevSecOps Vault (notas privadas)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: devpolatto/DevSecOps-Vault # <-- troque pelo nome real do seu Vault
           token: ${{ secrets.VAULT_ACCESS_TOKEN }}
@@ -59,12 +59,12 @@ jobs:
           find content/ -name "*.md" | wc -l
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22 # versão do .node-version do seu repo
 
       - name: Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
