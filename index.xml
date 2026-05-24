@@ -10,61 +10,61 @@
     <link>https://quartz.jzhao.xyz/guia-completo-autocomplete-local-continuedev-ollama</link>
     <guid>https://quartz.jzhao.xyz/guia-completo-autocomplete-local-continuedev-ollama</guid>
     <description><![CDATA[ Guia Completo: Autocomplete e Sugestões com Continue.dev e Ollama Crie seu próprio sistema de autocomplete inteligente rodando 100% localmente, sem dependências de APIs externas. ]]></description>
-    <pubDate>Sun, 24 May 2026 15:59:59 GMT</pubDate>
+    <pubDate>Sun, 24 May 2026 16:04:23 GMT</pubDate>
   </item><item>
     <title>Bem-vindo ao meu site pessoal</title>
     <link>https://quartz.jzhao.xyz/</link>
     <guid>https://quartz.jzhao.xyz/</guid>
     <description><![CDATA[ DevSecOps e Cloud Architecture ]]></description>
-    <pubDate>Sun, 24 May 2026 15:59:59 GMT</pubDate>
+    <pubDate>Sun, 24 May 2026 16:04:23 GMT</pubDate>
   </item><item>
     <title>Usando jq para analisar logs NDJSON</title>
     <link>https://quartz.jzhao.xyz/jq_for_ndjson_log</link>
     <guid>https://quartz.jzhao.xyz/jq_for_ndjson_log</guid>
     <description><![CDATA[ O que é NDJSON? NDJSON (Newline Delimited JSON) é um formato de arquivo onde cada linha é um objeto JSON separado. ]]></description>
-    <pubDate>Sun, 24 May 2026 15:59:59 GMT</pubDate>
+    <pubDate>Sun, 24 May 2026 16:04:23 GMT</pubDate>
   </item><item>
     <title>Padronização de Logs</title>
     <link>https://quartz.jzhao.xyz/starndard_logging</link>
     <guid>https://quartz.jzhao.xyz/starndard_logging</guid>
     <description><![CDATA[ Este documento serve como um guia abrangente para a criação, manutenção e análise de logs em sistemas de software. ]]></description>
-    <pubDate>Sun, 24 May 2026 15:59:59 GMT</pubDate>
+    <pubDate>Sun, 24 May 2026 16:04:23 GMT</pubDate>
   </item><item>
     <title>Teste Deploy</title>
     <link>https://quartz.jzhao.xyz/teste_deploy</link>
     <guid>https://quartz.jzhao.xyz/teste_deploy</guid>
     <description><![CDATA[  ]]></description>
-    <pubDate>Sun, 24 May 2026 15:59:59 GMT</pubDate>
-  </item><item>
-    <title>VSCode</title>
-    <link>https://quartz.jzhao.xyz/VSCode</link>
-    <guid>https://quartz.jzhao.xyz/VSCode</guid>
-    <description><![CDATA[ Configurações do meui VSCode Aqui estão algumas das minhas configurações favoritas do VSCode para melhorar a produtividade e a experiência de codificação: settings.json { &quot;editor.lineHeight&quot;: 24, &quot;editor.tabSize&quot;: 5, &quot;editor.insertSpaces&quot;: true, &quot;editor.renderWhite... ]]></description>
-    <pubDate>Sun, 24 May 2026 15:59:59 GMT</pubDate>
-  </item><item>
-    <title>Resize de um Persistent Volume</title>
-    <link>https://quartz.jzhao.xyz/Kubernets/Volumes/Resize-de-um-Persistent-Volume</link>
-    <guid>https://quartz.jzhao.xyz/Kubernets/Volumes/Resize-de-um-Persistent-Volume</guid>
-    <description><![CDATA[ Você tem um PVC (PersistentVolumeClaim) de 8Gi no Kubernetes que está cheio e deseja expandi-lo para 16Gi sem tempo de inatividade e sem interromper o workload. ]]></description>
-    <pubDate>Sun, 24 May 2026 15:59:59 GMT</pubDate>
-  </item><item>
-    <title>Daily commands</title>
-    <link>https://quartz.jzhao.xyz/Kubernets/daily_commands</link>
-    <guid>https://quartz.jzhao.xyz/Kubernets/daily_commands</guid>
-    <description><![CDATA[ Recupera todos os recursos kubectl get all -n marketplace ⚠️ Importante: kubectl get all não mostra tudo (ex: ConfigMaps, Secrets, Ingress). ]]></description>
-    <pubDate>Sun, 24 May 2026 15:59:59 GMT</pubDate>
-  </item><item>
-    <title>Estouro de memória no cgroup</title>
-    <link>https://quartz.jzhao.xyz/Kubernets/inicidentes/Memory_cgroup_out_of_memory</link>
-    <guid>https://quartz.jzhao.xyz/Kubernets/inicidentes/Memory_cgroup_out_of_memory</guid>
-    <description><![CDATA[ O que é um Memory cgroup out of memory (estouro de memória no cgroup), como ele ocorre e como lidar com ele em um ambiente Kubernetes. ]]></description>
-    <pubDate>Sun, 24 May 2026 15:59:59 GMT</pubDate>
+    <pubDate>Sun, 24 May 2026 16:04:23 GMT</pubDate>
   </item><item>
     <title>Falha de CORS ao acessar um serviço exposto pelo Istio</title>
     <link>https://quartz.jzhao.xyz/Kubernets/inicidentes/falha_de_cors_no_istio</link>
     <guid>https://quartz.jzhao.xyz/Kubernets/inicidentes/falha_de_cors_no_istio</guid>
     <description><![CDATA[ Descrição do Problema CORS Error em endpoint específico (PATCH) do serviço admin-api-hub – Falha de Preflight OPTIONS bloqueada por AuthorizationPolicy Istio Um único endpoint (/api/users/useradminaccount/{id}/useradminroleids) estava retornando erro de CORS apenas no browser (Firefox/Chrome) quando... ]]></description>
-    <pubDate>Sun, 24 May 2026 15:59:59 GMT</pubDate>
+    <pubDate>Sun, 24 May 2026 16:04:23 GMT</pubDate>
+  </item><item>
+    <title>Instalação</title>
+    <link>https://quartz.jzhao.xyz/Kubernets/k3s/install</link>
+    <guid>https://quartz.jzhao.xyz/Kubernets/k3s/install</guid>
+    <description><![CDATA[ #!/bin/bash # Variables DOMAIN_NAME=&quot;k3s.lab.local&quot; # Replace with your preferred domain for the K3s cluster INSTALL_OPTIONS=&quot;--write-kubeconfig-mode 644 --tls-san ${DOMAIN_NAME}&quot; K3S_BIN_DIR=&quot;/usr/local/bin&quot; K3S_SERVICE_FILE=&quot;/etc/systemd/system/k3s.service&quot; ... ]]></description>
+    <pubDate>Sun, 24 May 2026 16:04:23 GMT</pubDate>
+  </item><item>
+    <title>A variável de ambiente PATH</title>
+    <link>https://quartz.jzhao.xyz/Linux/A_variavel_de_ambiente_PATH</link>
+    <guid>https://quartz.jzhao.xyz/Linux/A_variavel_de_ambiente_PATH</guid>
+    <description><![CDATA[ A variável PATH informa ao shell onde procurar arquivos executáveis quando você executa um comando. ]]></description>
+    <pubDate>Sun, 24 May 2026 16:04:23 GMT</pubDate>
+  </item><item>
+    <title>Canivete Suíço</title>
+    <link>https://quartz.jzhao.xyz/Linux/Canivete_Suico</link>
+    <guid>https://quartz.jzhao.xyz/Linux/Canivete_Suico</guid>
+    <description><![CDATA[ Operadores Operadores Aritméticos+Adição-Subtração*Multiplicação/Divisão%Módulo**ExponenciaçãoOperadores de Atribuição=Atribui valor a uma variável+=Incrementa a variável por uma constante-=Decrementa a variável por uma constante*=Multiplica a variável por uma constante/=Divide a variável por uma co... ]]></description>
+    <pubDate>Sun, 24 May 2026 16:04:23 GMT</pubDate>
+  </item><item>
+    <title>Obter o tamanho do diretório</title>
+    <link>https://quartz.jzhao.xyz/Linux/Get_directory_size</link>
+    <guid>https://quartz.jzhao.xyz/Linux/Get_directory_size</guid>
+    <description><![CDATA[ TARGET_DIR=&quot;/var&quot; USAGE_MB=$(du -s &quot;$TARGET_DIR&quot; | awk &#039;{print $1}&#039; | numfmt --to=si --from-unit=1024 --suffix=MB) &amp;&amp; \ echo $USAGE_MB. ]]></description>
+    <pubDate>Sun, 24 May 2026 16:04:23 GMT</pubDate>
   </item>
     </channel>
   </rss>
