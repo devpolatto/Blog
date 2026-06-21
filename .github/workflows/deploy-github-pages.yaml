@@ -49,15 +49,21 @@ jobs:
 
           find content/ -name "*.md" -not -name "index.md" -delete
 
-          rsync -av --include="*.md" --include="*.png" --include="*.jpg" \
-                    --include="*.svg" --include="*.gif" \
-                    --include="*/" --exclude="*" \
-                    --exclude=".git/" \
-                    --exclude=".vscode/" \
-                    --exclude=".obsidian/" \
-                    --exclude=".trash/" \
-                    --exclude="Templates/" \
-                    vault-content/ content/
+          rsync -av \
+            --include="*.md" \
+            --include="*.png" \
+            --include="*.jpg" \
+            --include="*.svg" \
+            --include="*.gif" \
+            --exclude=".git/" \
+            --exclude=".vscode/" \
+            --exclude=".obsidian/" \
+            --exclude=".trash/" \
+            --exclude="Templates/" \
+            --exclude="node_modules/" \
+            --include="*/" \
+            --exclude="*" \
+            vault-content/ content/
 
           echo "✅ Sync DevSecOps Vault Finished!"
           echo "📝 Notes synced:"
